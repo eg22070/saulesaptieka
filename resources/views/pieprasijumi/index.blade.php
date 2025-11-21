@@ -157,7 +157,7 @@
             </div>
             <div class="mb-3">
                 <label for="datums" class="form-label">Datums</label>
-                <input type="date" class="form-control" id="datums" name="datums" required>
+                <input type="text" id="datums" name="datums" placeholder="DD/MM/YYYY" required>
             </div>
             <div class="mb-3">
                 <label for="aptiekas_name" class="form-label">Aptieka</label>
@@ -269,7 +269,14 @@
     const artikulaNameInput = document.getElementById('artikula_name');
     const artikulaIdInput = document.getElementById('artikula_id');
 
+    flatpickr("#datums", {
+        dateFormat: "d/m/Y" // Date format
+    });
 
+    function formatDate(dateStr) {
+        const [day, month, year] = dateStr.split('/');
+        return `${year}-${month}-${day}`;
+    }
     aptiekasNameInput.addEventListener('input', function() {
         // When input changes, update the hidden input with the corresponding ID
         const value = this.value;
@@ -318,6 +325,8 @@
         aptiekasNameInput.value = data.aptiekas_nosaukums; 
         artikulaNameInput.value = data.artikula_nosaukums;
 
+        
+
         if (!form.querySelector('input[name="_method"]')) {
           const methodInput = document.createElement('input');
           methodInput.type = 'hidden';
@@ -327,7 +336,7 @@
         } else {
           form.querySelector('input[name="_method"]').value = 'PUT';
         }
-        document.getElementById('datums').value = data.datums;
+        document.getElementById('datums').value = formatDate(data.datums);
         document.getElementById('aptiekas_id').value = data.aptiekas_id;
         document.getElementById('artikula_id').value = data.artikula_id;
         document.getElementById('daudzums').value = data.daudzums;
