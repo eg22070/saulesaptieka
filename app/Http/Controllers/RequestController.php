@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Requests;
 use App\Models\Pharmacy;  // Assuming such model exists
 use App\Models\Product;
+use Carbon\Carbon;
 
 class RequestController extends Controller
 {
@@ -38,6 +39,11 @@ class RequestController extends Controller
         // Fetch all aptiekas for dropdowns
         $aptiekas = Pharmacy::all();
         $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(10);
+
+        $pieprasijumi->transform(function ($request) {
+            $request->datums = Carbon::createFromFormat('Y-m-d', $request->datums)->format('d/m/Y'); // Adjust this line if needed
+            return $request;
+        });
 
         return view('pieprasijumi.index', compact('pieprasijumi', 'aptiekas', 'artikuli', 'status_filter'));
     }

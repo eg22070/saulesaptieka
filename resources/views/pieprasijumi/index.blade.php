@@ -3,7 +3,7 @@
         <h1>Pieraksti</h1>
     </x-slot>
 
-    <div class="container" style="width: 150%;">
+    <div class="container" style="width: 80%;">
         <!-- Search -->
         <form method="GET" action="{{ route('pieprasijumi.index') }}" class="mb-3">
             <div class="input-group">
@@ -29,7 +29,6 @@
                 <input class="form-check-input" type="radio" name="status_filter" id="incomplete" value="incomplete" {{ request('status_filter') == 'incomplete' ? 'checked' : '' }}>
                 <label class="form-check-label" for="incomplete">Nepabeigtie</label>
             </div>
-            <button class="btn btn-outline-secondary" type="submit">Filtrēt</button>
         </form>
     </div>
         <!-- Add Button -->
@@ -43,47 +42,39 @@
         @endif
 
         <!-- Table -->
-        <table class="table table-striped">
+        <table class="table table-striped" style="table-layout: fixed; border-collapse: collapse; width: 100%; overflow-wrap: break-word;">
             <thead>
                 <tr>
-                    <th> - </th>
-                    <th >Datums</th>
-                    <th >Aptieka</th>
-                    <th >Valsts</th>
-                    <th >ID numurs</th>
-                    <th c>Nosaukums</th>
-                    <th >Dau</th>
-                    <th>Iz d.</th>
-                    <th>Paziņojuma datums</th>
-                    <th>Stat</th>
-                    <th>Aizlie</th>
-                    <th>Iepircējs</th>
-                    <th>Piegādes datums</th>
-                    <th>Piezīmes</th>
-                    <th> - </th>
+                    <th style="width: 3%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
+                    <th style="width: 9%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
+                    <th style="width: 12%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aptieka</th>
+                    <th style="width: 6%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
+                    <th style="width: 10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ID numurs</th>
+                    <th style="width: 30%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
+                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Daudzums</th>
+                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Izrakstītais d.</th>
+                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Statuss</th>
+                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aizliegums</th>
+                    <th style="width: 6%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($pieprasijumi as $art)
                     <tr>
-                        <td>
+                        <td style="border: 1px solid #080000ff; padding: 4px;">
                             <!-- New column for status indicator -->
                             <span class="status-indicator" style="display: inline-block; width: 15px; height: 15px; border-radius: 50%; background-color: {{ $art->completed ? 'green' : 'red' }};"></span>
                         </td>
-                        <td >{{ $art->datums }}</td>
-                        <td >{{ $art->aptiekas->nosaukums }}</td>
-                        <td >{{ $art->artikuli->valsts }}</td>
-                        <td >{{ $art->artikuli->id_numurs }}</td>
-                        <td >{{ $art->artikuli->nosaukums }}</td>
-                        <td >{{ $art->daudzums }}</td>
-                        <td>{{ $art->izrakstitais_daudzums }}</td>
-                        <td>{{ $art->pazinojuma_datums }}</td>
-                        <td>{{ $art->statuss }}</td>
-                        <td>{{ $art->aizliegums }}</td>
-                        <td>{{ $art->iepircejs }}</td>
-                        <td>{{ $art->piegades_datums }}</td>
-                        <td>{{ $art->piezimes }}</td>
-                        <td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->nosaukums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->statuss }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->aizliegums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
                             <!-- Edit Button -->
                             <button class="btn btn-sm btn-primary edit-request-btn" 
                                     data-bs-toggle="modal" 
@@ -91,7 +82,9 @@
                                     data-id="{{ $art->id }}"
                                     data-datums="{{ $art->datums }}"
                                     data-aptiekas_id="{{ $art->aptiekas->id }}"
+                                    data-aptiekas_nosaukums="{{ $art->aptiekas->nosaukums }}" 
                                     data-artikula_id="{{ $art->artikuli->id }}"
+                                    data-artikula_nosaukums="{{ $art->artikuli->nosaukums }}" 
                                     data-daudzums="{{ $art->daudzums }}"
                                     data-izrakstitais_daudzums="{{ $art->izrakstitais_daudzums }}"
                                     data-pazinojuma_datums="{{ $art->pazinojuma_datums }}"
@@ -110,6 +103,19 @@
                                 @method('DELETE')
                                 <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Vai tiešām vēlaties dzēst šo pieprasījumu?')">Dzēst</button>
                             </form>
+                        </td>
+                    </tr>
+                    <tr class="additional-info" style="display:none;">
+                        <td colspan="11">
+                            <strong>Paziņojuma datums:</strong> {{ $art->pazinojuma_datums }} <br>
+                            <strong>Iepircējs:</strong> {{ $art->iepircejs }} <br>
+                            <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
+                            <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="11">
+                            <a href="#" class="see-more">Redzēt vairāk</a>
                         </td>
                     </tr>
                 @empty
@@ -138,45 +144,68 @@
 
         <div class="modal-body">
             <div class="mb-3" id="completedContainer" style="display: none;">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="completed" name="completed" value="1" >
-                            <label class="form-check-label" for="completed">Pabeigts</label>
-                        </div>
-                    </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="completed" name="completed" value="1" checked>
+                    <label class="form-check-label" for="completed">Pabeigts</label>
+                </div>
+            </div>
+            <div class="mb-3" id="unCompletedContainer" style="display: none;">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="uncompleted" name="uncompleted" value="0">
+                    <label class="form-check-label" for="uncompleted">Pabeigts</label>
+                </div>
+            </div>
             <div class="mb-3">
                 <label for="datums" class="form-label">Datums</label>
                 <input type="date" class="form-control" id="datums" name="datums" required>
-</div>
+            </div>
             <div class="mb-3">
-    <label for="aptiekas_id" class="form-label">Aptieka</label>
-    <input list="aptieki" id="aptiekas_id" name="aptiekas_id" class="form-control" placeholder="Rakstiet aptiekas nosaukumu" required>
-    <datalist id="aptieki">
-    @foreach($aptiekas as $aptieka)
-        <option value="{{ $aptieka->id }}">{{ $aptieka->nosaukums }}</option>
-    @endforeach
-    </datalist>
-</div>
+                <label for="aptiekas_name" class="form-label">Aptieka</label>
+                <!-- Input for user's visible selection -->
+                <input type="text" 
+                    class="form-control" 
+                    placeholder="Rakstiet aptiekas nosaukumu" 
+                    required 
+                    list="aptieki" 
+                    id="aptiekas_name" />
+                <!-- Hidden ID for form submission -->
+                <input type="hidden" id="aptiekas_id" name="aptiekas_id">
+                <datalist id="aptieki">
+                    @foreach($aptiekas as $aptieka)
+                        <option value="{{ $aptieka->nosaukums }}" data-id="{{ $aptieka->id }}"></option>
+                    @endforeach
+                </datalist>
+            </div>
 
-<div class="mb-3">
-    <label for="artikula_id" class="form-label">Artikuls</label>
-    <input list="artikuli" id="artikula_id" name="artikula_id" class="form-control" placeholder="Rakstiet artikula nosaukumu" required>
-    <datalist id="artikuli">
-    @foreach($artikuli as $artikuls)
-        <option value="{{ $artikuls->id }}">{{ $artikuls->nosaukums }}</option>
-    @endforeach
-    </datalist>
-</div>
+            <div class="mb-3">
+                <label for="artikula_name" class="form-label">Artikuls</label>
+                <!-- Input for user's visible selection -->
+                <input type="text" 
+                    class="form-control" 
+                    placeholder="Rakstiet artikula nosaukumu" 
+                    required 
+                    list="artikuli" 
+                    id="artikula_name" />
+                <!-- Hidden ID for form submission -->
+                <input type="hidden" id="artikula_id" name="artikula_id">
+                <datalist id="artikuli">
+                    @foreach($artikuli as $artikuls)
+                        <option value="{{ $artikuls->nosaukums }}" data-id="{{ $artikuls->id }}"></option>
+                    @endforeach
+                </datalist>
+            </div>
             <div class="mb-3">
                 <label for="daudzums" class="form-label">Daudzums</label>
                 <input type="number" class="form-control" id="daudzums" name="daudzums" required>
             </div>
+            <div id="additionalFields" style="display:none;">
             <div class="mb-3">
                 <label for="izrakstitais_daudzums" class="form-label">Izrakstītais daudzums</label>
                 <input type="number" class="form-control" id="izrakstitais_daudzums" name="izrakstitais_daudzums">
             </div>
             <div class="mb-3">
                 <label for="pazinojuma_datums" class="form-label">Paziņojuma datums</label>
-                <textarea class="form-control" id="pazinojuma_datums" name="pazinojuma_datums" rows="3"></textarea>
+                <input type="text" class="form-control" id="pazinojuma_datums" name="pazinojuma_datums">
             </div>
             <div class="mb-3">
                 <label for="statuss" class="form-label">Statuss</label>
@@ -211,11 +240,11 @@
             </div>
             <div class="mb-3">
                 <label for="piegades_datums" class="form-label">Piegādes datums</label>
-                <textarea class="form-control" id="piegades_datums" name="piegades_datums" rows="3"></textarea>
+                <input type="text" class="form-control" id="piegades_datums" name="piegades_datums">
             </div>
             <div class="mb-3">
                 <label for="piezimes" class="form-label">Piezīmes</label>
-                <textarea class="form-control" id="piezimes" name="piezimes" rows="3"></textarea>
+                <textarea class="form-control" id="piezimes" name="piezimes" rows="1"></textarea>
             </div>
         </div>
         <div class="modal-footer">
@@ -223,6 +252,7 @@
             <button type="submit" class="btn btn-primary" id="requestModalSaveBtn">Saglabāt</button>
         </div>
       </form>
+    </div>
     </div>
   </div>
 </div>
@@ -233,7 +263,32 @@
     const form = document.getElementById('requestForm');
     const modalTitle = document.getElementById('requestModalLabel');
     const saveBtn = document.getElementById('requestModalSaveBtn');
+    const aptiekasNameInput = document.getElementById('aptiekas_name');
+    const aptiekasIdInput = document.getElementById('aptiekas_id');
+    
+    const artikulaNameInput = document.getElementById('artikula_name');
+    const artikulaIdInput = document.getElementById('artikula_id');
 
+
+    aptiekasNameInput.addEventListener('input', function() {
+        // When input changes, update the hidden input with the corresponding ID
+        const value = this.value;
+        Array.from(document.getElementById('aptieki').options).forEach(option => {
+            if (option.value === value) {
+                aptiekasIdInput.value = option.getAttribute('data-id');
+            }
+        });
+    });
+
+    artikulaNameInput.addEventListener('input', function() {
+        // When input changes, update the hidden input with the corresponding ID
+        const value = this.value;
+        Array.from(document.getElementById('artikuli').options).forEach(option => {
+            if (option.value === value) {
+                artikulaIdInput.value = option.getAttribute('data-id');
+            }
+        });
+    });
     // "Add" button
     document.getElementById('addRequestBtn').addEventListener('click', function () {
       form.reset();
@@ -241,10 +296,14 @@
       if (form.querySelector('input[name="_method"]')) {
         form.querySelector('input[name="_method"]').remove();
       }
+      const today = new Date().toISOString().substring(0, 10);
+      document.getElementById('datums').value = today;
+
       modalTitle.textContent = 'Pievienot jaunu pieprasījumu';
       saveBtn.textContent = 'Saglabāt';
 
       document.getElementById('completedContainer').style.display = 'none';
+      additionalFields.style.display = 'none';
     });
 
     // "Edit" buttons
@@ -252,6 +311,13 @@
       btn.addEventListener('click', function () {
         const data = this.dataset;
         form.action = "/pieprasijumi/" + data.id;
+
+        aptiekasIdInput.value = data.aptiekas_id;
+        artikulaIdInput.value = data.artikula_id;
+
+        aptiekasNameInput.value = data.aptiekas_nosaukums; 
+        artikulaNameInput.value = data.artikula_nosaukums;
+
         if (!form.querySelector('input[name="_method"]')) {
           const methodInput = document.createElement('input');
           methodInput.type = 'hidden';
@@ -272,11 +338,42 @@
         document.getElementById('iepircejs').value = data.iepircejs;
         document.getElementById('piegades_datums').value = data.piegades_datums;
         document.getElementById('piezimes').value = data.piezimes;
-        document.getElementById('completed').checked = data.completed === '1';
-        document.getElementById('completedContainer').style.display = 'block';
-        // Update modal title and button
+        if (data.completed === '1') {
+            document.getElementById('completedContainer').style.display = 'block';
+            document.getElementById('completed').checked = true;
+            document.getElementById('unCompletedContainer').style.display = 'none';
+            document.getElementById('uncompleted').checked = false;
+        } else {
+            document.getElementById('completedContainer').style.display = 'none';
+            document.getElementById('completed').checked = true;
+            document.getElementById('unCompletedContainer').style.display = 'block';
+            document.getElementById('uncompleted').checked = false;
+        }
+
+        additionalFields.style.display = 'block';
         modalTitle.textContent = 'Labot pieprasījumu';
         saveBtn.textContent = 'Atjaunināt';
+      });
+    });
+    // Handle "See More" link click
+    document.querySelectorAll('.see-more').forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+            const additionalRow = this.closest('tr').previousElementSibling;
+
+            // Toggle visibility of the additional info row
+            if (additionalRow.style.display === 'none') {
+                additionalRow.style.display = ''; // Show the additional information
+                this.textContent = 'Redzēt mazāk'; // Change link text
+            } else {
+                additionalRow.style.display = 'none'; // Hide the additional information
+                this.textContent = 'Redzēt vairāk'; // Reset link text
+            }
+        });
+    });
+    document.querySelectorAll('input[name="status_filter"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        this.form.submit(); // Submit the form when a radio button is changed
       });
     });
   });
