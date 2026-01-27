@@ -1,11 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Pieraksti</h1>
+        @if ($errors->any())
+            <div class="alert alert-danger" style="margin: 20px;">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Aizvērt"></button>
+            </div>
+        @endif
     </x-slot>
 
-    <div class="container" style="width: 80%;">
+    <div class="container" style="width: 90%; max-width: 2200px; margin: 0 auto;">
         <!-- Search -->
-        <form method="GET" action="{{ route('pieprasijumi.index') }}" class="mb-3">
+        <form method="GET" action="{{ route('pieprasijumi.index') }}" class="mb-3 mt-3">
             <div class="input-group">
                 <input type="text" name="search" class="form-control" placeholder="Meklēt pēc aptiekas, artikula vai iepircēja" value="{{ request('search') }}">
                 <div class="input-group-append">
@@ -34,42 +48,40 @@
         <!-- Add Button -->
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#requestModal" id="addRequestBtn">Pievienot jaunu pieprasījumu</button>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Aizvērt"></button>
-            </div>
-        @endif
+        
 
         <!-- Table -->
         <table class="table table-striped" style="table-layout: fixed; border-collapse: collapse; width: 100%; overflow-wrap: break-word;">
             <thead>
                 <tr>
                     <th style="width: 3%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
-                    <th style="width: 9%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
+                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
                     <th style="width: 12%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aptieka</th>
-                    <th style="width: 6%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
+                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
                     <th style="width: 10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ID numurs</th>
-                    <th style="width: 30%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
-                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Daudzums</th>
-                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Izrakstītais d.</th>
-                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Statuss</th>
+                    <th style="width: 27%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
+                    <th style="width: 7%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Daudzums</th>
+                    <th style="width: 9%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Izraks. daudz.</th>
+                    <th style="width: 7%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Statuss</th>
                     <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aizliegums</th>
                     <th style="width: 6%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($pieprasijumi as $art)
+                    <!-- Main Row -->
                     <tr>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">
-                            <!-- New column for status indicator -->
-                            <span class="status-indicator" style="display: inline-block; width: 15px; height: 15px; border-radius: 50%; background-color: {{ $art->completed ? 'green' : 'red' }};"></span>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                            <!-- Status Indicator (Now Clickable) -->
+                            <span class="status-indicator toggle-details" 
+                            style="background-color: {{ $art->completed ? 'green' : 'red' }};" 
+                            title="Klikšķiniet, lai redzētu detaļas"></span>
                         </td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums->format('d/m/Y') }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->nosaukums }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px;"><b>{{ $art->artikuli->nosaukums }}</b></td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->statuss }}</td>
@@ -105,22 +117,27 @@
                             </form>
                         </td>
                     </tr>
+                    
+                    <!-- Additional Info Row (Hidden by default) -->
                     <tr class="additional-info" style="display:none;">
-                        <td colspan="11">
-                            <strong>Paziņojuma datums:</strong> {{ $art->pazinojuma_datums }} <br>
-                            <strong>Iepircējs:</strong> {{ $art->iepircejs }} <br>
-                            <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
-                            <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="11">
-                            <a href="#" class="see-more">Redzēt vairāk</a>
+                        <td colspan="11" style="background-color: #f8f9fa; border: 1px solid #080000ff;">
+                            <div style="padding: 10px;">
+                                <strong>Paziņojuma datums:</strong> {{ $art->pazinojuma_datums }} <br>
+                                <strong>Iepircējs:</strong> {{ $art->iepircejs }} <br>
+                                <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
+                                <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
+                                <strong>Izpildīja:</strong> 
+                                @if($art->completer)
+                                    {{ $art->completer->name }} ({{ $art->completed_at ? $art->completed_at->format('d/m/Y H:i') : '' }})
+                                @else
+                                     <!-- Or leave blank if you prefer -->
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="14">Netika atrasti pieprasījumi!</td>
+                        <td colspan="11">Netika atrasti pieprasījumi!</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -258,87 +275,152 @@
 </div>
 </x-app-layout>
 
+<style>
+    .status-indicator {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        /* Initial state, add transition for smoothness */
+        transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; 
+        border: 2px solid transparent; /* Start with a transparent border */
+    }
+
+    .status-indicator:hover {
+        /* Example: slightly darken the color on hover */
+        filter: brightness(85%); /* Makes color slightly darker */
+        /* Example: Add a border */
+        border: 2px solid rgba(0, 0, 0, 0.3); /* A subtle dark border */
+        /* Example: Or a soft shadow */
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2); 
+    }
+    
+    /* If you want different hover effects for green vs. red */
+    .status-indicator[style*="background-color: green"]:hover {
+        filter: brightness(90%); /* Slightly less darken for green */
+        border: 2px solid rgba(0, 128, 0, 0.5); /* Green border */
+    }
+
+    .status-indicator[style*="background-color: red"]:hover {
+        filter: brightness(90%); /* Slightly less darken for red */
+        border: 2px solid rgba(255, 0, 0, 0.5); /* Red border */
+    }
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('requestForm');
     const modalTitle = document.getElementById('requestModalLabel');
     const saveBtn = document.getElementById('requestModalSaveBtn');
+    
+    // Inputs
     const aptiekasNameInput = document.getElementById('aptiekas_name');
     const aptiekasIdInput = document.getElementById('aptiekas_id');
-    
     const artikulaNameInput = document.getElementById('artikula_name');
     const artikulaIdInput = document.getElementById('artikula_id');
+    const additionalFields = document.getElementById('additionalFields');
 
+    // Initialize Date Picker
     flatpickr("#datums", {
-        dateFormat: "d/m/Y" // Date format
+        dateFormat: "d/m/Y" 
     });
 
-    function formatDate(dateStr) {
-        const [day, month, year] = dateStr.split('/');
-        return `${year}-${month}-${day}`;
+    // Helper: Convert Carbon format (YYYY-MM-DD...) to Flatpickr format (DD/MM/YYYY)
+    function formatDateForInput(dateStr) {
+        if (!dateStr) return '';
+        // If it comes as YYYY-MM-DD HH:MM:SS or just YYYY-MM-DD
+        const datePart = dateStr.split(' ')[0]; 
+        const [year, month, day] = datePart.split('-');
+        if(year && month && day) {
+            return `${day}/${month}/${year}`;
+        }
+        return dateStr; // Return original if parsing fails
     }
+
+    // Auto-fill Hidden ID for Aptieka
     aptiekasNameInput.addEventListener('input', function() {
-        // When input changes, update the hidden input with the corresponding ID
         const value = this.value;
+        let found = false;
         Array.from(document.getElementById('aptieki').options).forEach(option => {
             if (option.value === value) {
                 aptiekasIdInput.value = option.getAttribute('data-id');
+                found = true;
             }
         });
+        if(!found) aptiekasIdInput.value = ''; // Clear ID if text doesn't match list
     });
 
+    // Auto-fill Hidden ID for Artikuls
     artikulaNameInput.addEventListener('input', function() {
-        // When input changes, update the hidden input with the corresponding ID
         const value = this.value;
+        let found = false;
         Array.from(document.getElementById('artikuli').options).forEach(option => {
             if (option.value === value) {
                 artikulaIdInput.value = option.getAttribute('data-id');
+                found = true;
             }
         });
+        if(!found) artikulaIdInput.value = ''; // Clear ID if text doesn't match list
     });
-    // "Add" button
+
+    // ---------------------------------------------------------
+    // "ADD" BUTTON LOGIC
+    // ---------------------------------------------------------
     document.getElementById('addRequestBtn').addEventListener('click', function () {
       form.reset();
-      form.action = "{{ route('pieprasijumi.store') }}"; // your route to store
-      if (form.querySelector('input[name="_method"]')) {
-        form.querySelector('input[name="_method"]').remove();
+      form.action = "{{ route('pieprasijumi.store') }}"; 
+      
+      // Remove _method input if it exists (forcing standard POST)
+      const methodInput = form.querySelector('input[name="_method"]');
+      if (methodInput) {
+        methodInput.remove();
       }
-      const today = new Date().toISOString().substring(0, 10);
-      document.getElementById('datums').value = today;
 
+      // Set today's date
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      document.getElementById('datums').value = dd + '/' + mm + '/' + yyyy;
+
+      // UI Changes
       modalTitle.textContent = 'Pievienot jaunu pieprasījumu';
       saveBtn.textContent = 'Saglabāt';
-
       document.getElementById('completedContainer').style.display = 'none';
+      document.getElementById('unCompletedContainer').style.display = 'none';
       additionalFields.style.display = 'none';
     });
 
-    // "Edit" buttons
+    // ---------------------------------------------------------
+    // "EDIT" BUTTON LOGIC
+    // ---------------------------------------------------------
     document.querySelectorAll('.edit-request-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const data = this.dataset;
         form.action = "/pieprasijumi/" + data.id;
 
+        // Populate Hidden IDs
         aptiekasIdInput.value = data.aptiekas_id;
         artikulaIdInput.value = data.artikula_id;
 
+        // Populate Visible Text Inputs
         aptiekasNameInput.value = data.aptiekas_nosaukums; 
         artikulaNameInput.value = data.artikula_nosaukums;
 
-        
-
-        if (!form.querySelector('input[name="_method"]')) {
-          const methodInput = document.createElement('input');
+        // Ensure _method="PUT" exists
+        let methodInput = form.querySelector('input[name="_method"]');
+        if (!methodInput) {
+          methodInput = document.createElement('input');
           methodInput.type = 'hidden';
           methodInput.name = '_method';
-          methodInput.value = 'PUT';
           form.appendChild(methodInput);
-        } else {
-          form.querySelector('input[name="_method"]').value = 'PUT';
         }
-        document.getElementById('datums').value = formatDate(data.datums);
-        document.getElementById('aptiekas_id').value = data.aptiekas_id;
-        document.getElementById('artikula_id').value = data.artikula_id;
+        methodInput.value = 'PUT';
+
+        // Populate Form Fields
+        // Note: data.datums usually comes from DB as YYYY-MM-DD, we need DD/MM/YYYY for input
+        document.getElementById('datums').value = formatDateForInput(data.datums);
         document.getElementById('daudzums').value = data.daudzums;
         document.getElementById('izrakstitais_daudzums').value = data.izrakstitais_daudzums;
         document.getElementById('pazinojuma_datums').value = data.pazinojuma_datums;
@@ -347,42 +429,55 @@
         document.getElementById('iepircejs').value = data.iepircejs;
         document.getElementById('piegades_datums').value = data.piegades_datums;
         document.getElementById('piezimes').value = data.piezimes;
+
+        // Handle Completed/Uncompleted Checkboxes
         if (data.completed === '1') {
             document.getElementById('completedContainer').style.display = 'block';
             document.getElementById('completed').checked = true;
+            
             document.getElementById('unCompletedContainer').style.display = 'none';
             document.getElementById('uncompleted').checked = false;
         } else {
             document.getElementById('completedContainer').style.display = 'none';
-            document.getElementById('completed').checked = true;
+            document.getElementById('completed').checked = false; // Reset main checkbox
+            
             document.getElementById('unCompletedContainer').style.display = 'block';
-            document.getElementById('uncompleted').checked = false;
+            document.getElementById('uncompleted').checked = false; 
         }
 
+        // UI Changes
         additionalFields.style.display = 'block';
         modalTitle.textContent = 'Labot pieprasījumu';
         saveBtn.textContent = 'Atjaunināt';
       });
     });
-    // Handle "See More" link click
-    document.querySelectorAll('.see-more').forEach(link => {
-        link.addEventListener('click', function (event) {
-            event.preventDefault();
-            const additionalRow = this.closest('tr').previousElementSibling;
 
-            // Toggle visibility of the additional info row
-            if (additionalRow.style.display === 'none') {
-                additionalRow.style.display = ''; // Show the additional information
-                this.textContent = 'Redzēt mazāk'; // Change link text
-            } else {
-                additionalRow.style.display = 'none'; // Hide the additional information
-                this.textContent = 'Redzēt vairāk'; // Reset link text
+    // ---------------------------------------------------------
+    // ROW EXPANSION LOGIC (Red/Green Circle Click)
+    // ---------------------------------------------------------
+    document.querySelectorAll('.toggle-details').forEach(indicator => {
+        indicator.addEventListener('click', function (event) {
+            event.stopPropagation();
+
+            const mainRow = this.closest('tr');
+            const additionalRow = mainRow.nextElementSibling;
+
+            if (additionalRow && additionalRow.classList.contains('additional-info')) {
+                if (additionalRow.style.display === 'none') {
+                    additionalRow.style.display = 'table-row';
+                } else {
+                    additionalRow.style.display = 'none';
+                }
             }
         });
     });
+
+    // ---------------------------------------------------------
+    // FILTER RADIO BUTTONS
+    // ---------------------------------------------------------
     document.querySelectorAll('input[name="status_filter"]').forEach(function (radio) {
       radio.addEventListener('change', function () {
-        this.form.submit(); // Submit the form when a radio button is changed
+        this.form.submit();
       });
     });
   });

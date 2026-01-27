@@ -6,13 +6,12 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RequestController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Redirect the root URL to the login page for guests
+Route::redirect('/', '/login')->middleware('guest');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Set the 'pieprasijumi.index' as the landing page for authenticated users
+Route::redirect('/', '/pieprasijumi')->middleware('auth');
+
 Route::resource('pharmacies', PharmacyController::class);
 Route::resource('artikuli', ProductController::class);
 Route::resource('pieprasijumi', RequestController::class);

@@ -40,10 +40,7 @@ class RequestController extends Controller
         $aptiekas = Pharmacy::all();
         $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(10);
 
-        $pieprasijumi->transform(function ($request) {
-            $request->datums = Carbon::createFromFormat('Y-m-d', $request->datums)->format('d/m/Y'); // Adjust this line if needed
-            return $request;
-        });
+        
 
         return view('pieprasijumi.index', compact('pieprasijumi', 'aptiekas', 'artikuli', 'status_filter'));
     }
@@ -92,23 +89,54 @@ class RequestController extends Controller
 
     public function update(Request $request, $id)
     {
+        $requestItem = Requests::findOrFail($id);
+        
         $validated = $request->validate([
-            'datums' => 'required|date',
+            'datums' => 'required|date_format:d/m/Y', // Validation is correct
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
             'izrakstitais_daudzums' => 'nullable|integer',
-            'pazinojuma_datums' => 'nullable|string',
+            'pazinojuma_datums' => 'nullable|date_format:d/m/Y', // Add format if it's a date
             'statuss' => 'nullable|in:Pasūtīts,Atcelts,Mainīta piegāde,Ir noliktavā,Daļēji atlikumā',
             'aizliegums' => 'nullable|in:Drīkst aizvietot,Nedrīkst aizvietot,NVD,Stacionārs',
             'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta',
-            'piegades_datums' => 'nullable|string',
+            'piegades_datums' => 'nullable|date_format:d/m/Y', // Add format if it's a date
             'piezimes' => 'nullable|string',
+            // Add 'completed' to validation, it's boolean, not part of date issue
+            'completed' => 'nullable|boolean', 
         ]);
-        $validated['completed'] = $request->has('completed') ? true : false;
-        $requestItem = Requests::findOrFail($id);
-        $requestItem->update($validated);
 
+        // --- NEW CONVERSION STEP ---
+        // Convert the 'datums' string from 'd/m/Y' to a Carbon object
+        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
+        // Do the same for other date fields if they are present in $validated and using d/m/Y
+        if (isset($validated['pazinojuma_datums']) && $validated['pazinojuma_datums']) {
+             $validated['pazinojuma_datums'] = Carbon::createFromFormat('d/m/Y', $validated['pazinojuma_datums'])->format('Y-m-d');
+        }
+        if (isset($validated['piegades_datums']) && $validated['piegades_datums']) {
+             $validated['piegades_datums'] = Carbon::createFromFormat('d/m/Y', $validated['piegades_datums'])->format('Y-m-d');
+        }
+        // --- END NEW CONVERSION STEP ---
+
+
+        // Logic for completion (keep this as is)
+        $isCompleted = $request->has('completed') && $request->completed == '1';
+        
+        if ($isCompleted) {
+            $validated['completed'] = true;
+            if (!$requestItem->completed) { // Check against the original item's status
+                $validated['completed_at'] = now();
+                $validated['who_completed'] = auth()->id();
+            }
+        } else {
+            $validated['completed'] = false;
+            $validated['completed_at'] = null;
+            $validated['who_completed'] = null;
+        }
+        
+        $requestItem->update($validated);
+        
         return redirect()->route('pieprasijumi.index')->with('success', 'Pieprasījums veiksmīgi atjaunināts');
     }
 

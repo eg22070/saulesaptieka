@@ -1,11 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Aptiekas</h1>
+        @if ($errors->any())
+            <div class="alert alert-danger" style="margin: 20px;">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
     </x-slot>
 
-    <div class="container" style="width: 80%;">
+    <div class="container" style="width: 90%; max-width: 2200px; margin: 0 auto;">
         <!-- Search Bar -->
-        <form action="{{ route('pharmacies.index') }}" method="GET" class="mb-3">
+        <form action="{{ route('pharmacies.index') }}" method="GET" class="mb-3 mt-3">
             <div class="input-group">
                 <input type="text" name="search" class="form-control" placeholder="Meklēt pēc aptiekas nosaukuma vai adreses" value="{{ request('search') }}">
                 <div class="input-group-append">
@@ -16,12 +30,7 @@
 
         <!-- Add Pharmacy Button -->
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#pharmacyModal" id="addPharmacyBtn">Pievienot jaunu aptieku</button>
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+        
         <!-- Pharmacies Table -->
         <table class="table table-striped">
             <thead>
@@ -37,15 +46,18 @@
                         <td>{{ $pharmacy->nosaukums }}</td>
                         <td>{{ $pharmacy->adrese }}</td>
                         <td>
-                            <button class="btn btn-sm btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#pharmacyModal"
-                            data-id="{{ $pharmacy->id }}"
-                            data-nosk=" {{ $pharmacy->nosaukums }}"
-                            data-adrese="{{ $pharmacy->adrese }}">Labot</button>
-                            <form action="{{ route('pharmacies.destroy', $pharmacy->id) }}" method="POST" style="display: inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Vai tiešām vēlaties izdzēst šo aptieku?')">Dzēst</button>
-                            </form>
+                            <div class="d-flex gap-2"> <!-- Using flexbox with a small gap -->
+                              <button class="btn btn-sm btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#pharmacyModal"
+                              data-id="{{ $pharmacy->id }}"
+                              data-nosk="{{ $pharmacy->nosaukums }}"
+                              data-adrese="{{ $pharmacy->adrese }}">Labot</button>
+                              
+                              <form action="{{ route('pharmacies.destroy', $pharmacy->id) }}" method="POST">
+                                  @csrf
+                                  @method('DELETE')
+                                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Vai tiešām vēlaties izdzēst šo aptieku?')">Dzēst</button>
+                              </form>
+                          </div>
                         </td>
                     </tr>
                 @empty

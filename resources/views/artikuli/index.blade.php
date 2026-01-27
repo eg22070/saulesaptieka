@@ -1,11 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Artikuli</h1>
+        @if ($errors->any())
+            <div class="alert alert-danger" style="margin: 20px;">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif 
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
     </x-slot>
 
-    <div class="container" style="width: 80%;">
+    <div class="container" style="width: 90%; max-width: 2200px; margin: 0 auto;">
         <!-- Search Bar -->
-        <form action="{{ route('artikuli.index') }}" method="GET" class="mb-3">
+        <form action="{{ route('artikuli.index') }}" method="GET" class="mb-3 mt-3">
             <div class="input-group">
                 <input type="text" name="search" class="form-control" placeholder="Meklēt pēc nosaukuma, id numura vai valsts" value="{{ request('search') }}">
                 <div class="input-group-append">
@@ -17,12 +31,8 @@
         <!-- Add Artikuls Button -->
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#artikuliModal" id="addArtikulsBtn">Pievienot jaunu artikulu</button>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+       
+                
 
         <!-- Artikuli Table -->
         <table class="table table-striped">
@@ -47,23 +57,25 @@
                         <td>{{ $artikuls->analogs }}</td>
                         <td>{{ $artikuls->atzimes }}</td>
                         <td>
-                            <button class="btn btn-sm btn-primary edit-artikuls-btn" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#artikuliModal"
-                                    data-id="{{ $artikuls->id }}"
-                                    data-nosaukums="{{ $artikuls->nosaukums }}"
-                                    data-id_numurs="{{ $artikuls->id_numurs }}"
-                                    data-valsts="{{ $artikuls->valsts }}"
-                                    data-snn="{{ $artikuls->snn }}"
-                                    data-analogs="{{ $artikuls->analogs }}"
-                                    data-atzimes="{{ $artikuls->atzimes }}"
-                            >Labot</button>
+                            <div class="d-flex gap-2"> <!-- Using flexbox with a small gap -->
+                                <button class="btn btn-sm btn-primary edit-artikuls-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#artikuliModal"
+                                        data-id="{{ $artikuls->id }}"
+                                        data-nosaukums="{{ $artikuls->nosaukums }}"
+                                        data-id_numurs="{{ $artikuls->id_numurs }}"
+                                        data-valsts="{{ $artikuls->valsts }}"
+                                        data-snn="{{ $artikuls->snn }}"
+                                        data-analogs="{{ $artikuls->analogs }}"
+                                        data-atzimes="{{ $artikuls->atzimes }}"
+                                >Labot</button>
 
-                            <form action="{{ route('artikuli.destroy', $artikuls->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Vai tiešām vēlaties izdzēst šo artikulu?')">Dzēst</button>
-                            </form>
+                                <form action="{{ route('artikuli.destroy', $artikuls->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Vai tiešām vēlaties izdzēst šo artikulu?')">Dzēst</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
