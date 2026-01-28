@@ -19,7 +19,7 @@ class PharmacyController extends Controller
         }
 
         // Sort by name in alphabetical order
-        $pharmacies = $query->orderBy('nosaukums')->paginate(10);
+        $pharmacies = $query->orderBy('nosaukums')->paginate(30);
 
         return view('pharmacies.index', compact('pharmacies'));
     }

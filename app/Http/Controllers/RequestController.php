@@ -38,7 +38,7 @@ class RequestController extends Controller
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
         $aptiekas = Pharmacy::all();
-        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(10);
+        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(20);
 
         
 
@@ -55,7 +55,7 @@ class RequestController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'datums' => 'required|date',
+            'datums' => 'required|date_format:d/m/Y',
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -67,6 +67,7 @@ class RequestController extends Controller
             'piegades_datums' => 'nullable|string',
             'piezimes' => 'nullable|string',
         ]);
+        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
         Requests::create($validated);
 
@@ -123,16 +124,10 @@ class RequestController extends Controller
         // Logic for completion (keep this as is)
         $isCompleted = $request->has('completed') && $request->completed == '1';
         
-        if ($isCompleted) {
+        if ($request->has('completed') && $request->completed == '1') {
             $validated['completed'] = true;
-            if (!$requestItem->completed) { // Check against the original item's status
-                $validated['completed_at'] = now();
-                $validated['who_completed'] = auth()->id();
-            }
-        } else {
-            $validated['completed'] = false;
-            $validated['completed_at'] = null;
-            $validated['who_completed'] = null;
+            $validated['completed_at'] = now();
+            $validated['who_completed'] = auth()->id();
         }
         
         $requestItem->update($validated);

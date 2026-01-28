@@ -148,36 +148,29 @@
 
 <!-- Pieprasījumi Modal -->
 <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog" style="max-width: 40%;">
     <div class="modal-content">
       <form id="requestForm" method="POST" action="">
         @csrf
         @method('POST') <!-- Will be overridden for edit -->
 
         <div class="modal-header">
-          <h5 class="modal-title" id="requestModalLabel">Pievienot/labot pieprasījumu</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Aizvērt"></button>
+        <h5 class="modal-title" id="requestModalLabel">Pievienot/labot pieprasījumu</h5>
+        <div class="d-flex align-items-center">
+            <div class="me-3" id="izpilditContainer" style="display: none;">
+            <button type="button" class="btn btn-success" id="izpilditBtn">Izpildīt</button>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Aizvērt"></button>
+        </div>
         </div>
 
         <div class="modal-body">
-            <div class="mb-3" id="completedContainer" style="display: none;">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="completed" name="completed" value="1" checked>
-                    <label class="form-check-label" for="completed">Pabeigts</label>
-                </div>
-            </div>
-            <div class="mb-3" id="unCompletedContainer" style="display: none;">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="uncompleted" name="uncompleted" value="0">
-                    <label class="form-check-label" for="uncompleted">Pabeigts</label>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="datums" class="form-label">Datums</label>
+            <div class="mb-2">
+                <label for="datums" class="form-label mr-3">Datums</label>
                 <input type="text" id="datums" name="datums" placeholder="DD/MM/YYYY" required>
             </div>
-            <div class="mb-3">
-                <label for="aptiekas_name" class="form-label">Aptieka</label>
+            <div class="mb-2 d-flex align-items-center">
+                <label for="aptiekas_name" class="form-label mr-3">Aptieka</label>
                 <!-- Input for user's visible selection -->
                 <input type="text" 
                     class="form-control" 
@@ -194,8 +187,8 @@
                 </datalist>
             </div>
 
-            <div class="mb-3">
-                <label for="artikula_name" class="form-label">Artikuls</label>
+            <div class="mb-2 d-flex align-items-center">
+                <label for="artikula_name" class="form-label mr-3">Artikuls</label>
                 <!-- Input for user's visible selection -->
                 <input type="text" 
                     class="form-control" 
@@ -211,22 +204,22 @@
                     @endforeach
                 </datalist>
             </div>
-            <div class="mb-3">
-                <label for="daudzums" class="form-label">Daudzums</label>
-                <input type="number" class="form-control" id="daudzums" name="daudzums" required>
+            <div class="mb-2 d-flex align-items-center">
+                <label for="daudzums" class="form-label mr-3" style="white-space: nowrap;">Daudzums</label>
+                <input type="number" class="form-control" id="daudzums" name="daudzums" style="width: 100px;" required>
             </div>
             <div id="additionalFields" style="display:none;">
-            <div class="mb-3">
-                <label for="izrakstitais_daudzums" class="form-label">Izrakstītais daudzums</label>
-                <input type="number" class="form-control" id="izrakstitais_daudzums" name="izrakstitais_daudzums">
+            <div class="mb-2 d-flex align-items-center">
+                <label for="izrakstitais_daudzums" class="form-label mr-3" style="white-space: nowrap;">Izrakstītais daudzums</label>
+                <input type="number" class="form-control" id="izrakstitais_daudzums" name="izrakstitais_daudzums" style="width: 100px;">
             </div>
-            <div class="mb-3">
-                <label for="pazinojuma_datums" class="form-label">Paziņojuma datums</label>
-                <input type="text" class="form-control" id="pazinojuma_datums" name="pazinojuma_datums">
+            <div class="mb-2 d-flex align-items-center">
+                <label for="pazinojuma_datums" class="form-label mr-3" style="white-space: nowrap;">Paziņojuma datums</label>
+                <textarea class="form-control" id="pazinojuma_datums" name="pazinojuma_datums" rows="1"></textarea>
             </div>
-            <div class="mb-3">
-                <label for="statuss" class="form-label">Statuss</label>
-                <select class="form-control" id="statuss" name="statuss">
+            <div class="mb-2 d-flex align-items-center">
+                <label for="statuss" class="form-label mr-3">Statuss</label>
+                <select class="form-control" id="statuss" name="statuss" style="width: 200px;">
                     <option value>Izvēlieties statusu</option>
                     <option value="Pasūtīts">Pasūtīts</option>
                     <option value="Atcelts">Atcelts</option>
@@ -235,9 +228,9 @@
                     <option value="Daļēji atlikumā">Daļēji atlikumā</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="aizliegums" class="form-label">Aizliegums</label>
-                <select class="form-control" id="aizliegums" name="aizliegums">
+            <div class="mb-2 d-flex align-items-center">
+                <label for="aizliegums" class="form-label mr-3">Aizliegums</label>
+                <select class="form-control" id="aizliegums" name="aizliegums" style="width: 200px;">
                     <option value>Izvēlieties aizliegumu</option>
                     <option value="Drīkst aizvietot">Drīkst aizvietot</option>
                     <option value="Nedrīkst aizvietot">Nedrīkst aizvietot</option>
@@ -245,9 +238,9 @@
                     <option value="Stacionārs">Stacionārs</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="iepircejs" class="form-label">Iepircējs</label>
-                <select class="form-control" id="iepircejs" name="iepircejs">
+            <div class="mb-2 d-flex align-items-center">
+                <label for="iepircejs" class="form-label mr-3">Iepircējs</label>
+                <select class="form-control" id="iepircejs" name="iepircejs" style="width: 200px;">
                     <option value>Izvēlieties iepircēju</option>
                     <option value="Artūrs">Artūrs</option>
                     <option value="Liene">Liene</option>
@@ -255,12 +248,12 @@
                     <option value="Iveta">Iveta</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="piegades_datums" class="form-label">Piegādes datums</label>
-                <input type="text" class="form-control" id="piegades_datums" name="piegades_datums">
+            <div class="mb-2 d-flex align-items-center">
+                <label for="piegades_datums" class="form-label mr-3" style="white-space: nowrap;">Piegādes datums</label>
+                <textarea class="form-control" id="piegades_datums" name="piegades_datums" rows="1"></textarea>
             </div>
-            <div class="mb-3">
-                <label for="piezimes" class="form-label">Piezīmes</label>
+            <div class="mb-1 d-flex align-items-center">
+                <label for="piezimes" class="form-label mr-3">Piezīmes</label>
                 <textarea class="form-control" id="piezimes" name="piezimes" rows="1"></textarea>
             </div>
         </div>
@@ -313,6 +306,7 @@
     const form = document.getElementById('requestForm');
     const modalTitle = document.getElementById('requestModalLabel');
     const saveBtn = document.getElementById('requestModalSaveBtn');
+    const izpilditBtn = document.getElementById('izpilditBtn');
     
     // Inputs
     const aptiekasNameInput = document.getElementById('aptiekas_name');
@@ -387,8 +381,6 @@
       // UI Changes
       modalTitle.textContent = 'Pievienot jaunu pieprasījumu';
       saveBtn.textContent = 'Saglabāt';
-      document.getElementById('completedContainer').style.display = 'none';
-      document.getElementById('unCompletedContainer').style.display = 'none';
       additionalFields.style.display = 'none';
     });
 
@@ -432,17 +424,9 @@
 
         // Handle Completed/Uncompleted Checkboxes
         if (data.completed === '1') {
-            document.getElementById('completedContainer').style.display = 'block';
-            document.getElementById('completed').checked = true;
-            
-            document.getElementById('unCompletedContainer').style.display = 'none';
-            document.getElementById('uncompleted').checked = false;
+            document.getElementById('izpilditContainer').style.display = 'none';
         } else {
-            document.getElementById('completedContainer').style.display = 'none';
-            document.getElementById('completed').checked = false; // Reset main checkbox
-            
-            document.getElementById('unCompletedContainer').style.display = 'block';
-            document.getElementById('uncompleted').checked = false; 
+            document.getElementById('izpilditContainer').style.display = 'block';
         }
 
         // UI Changes
@@ -481,4 +465,15 @@
       });
     });
   });
+  izpilditBtn.addEventListener('click', function() {
+        if (confirm('Vai tiešām vēlaties izpildīt šo ierakstu?')) {
+            const form = document.getElementById('requestForm');
+            const completedInput = document.createElement('input');
+            completedInput.type = 'hidden';
+            completedInput.name = 'completed';
+            completedInput.value = '1';
+            form.appendChild(completedInput);
+            form.submit();
+        }
+    });
 </script>

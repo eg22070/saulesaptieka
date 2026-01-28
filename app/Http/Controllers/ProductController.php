@@ -20,7 +20,7 @@ class ProductController extends Controller
                          ->orWhere('valsts', 'like', "%$searchTerm%")
                          ->orWhere('snn', 'like', "%$searchTerm%");
         })
-        ->paginate(10);
+        ->paginate(30);
 
         return view('artikuli.index', compact('products'));
     }
