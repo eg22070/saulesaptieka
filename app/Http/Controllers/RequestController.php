@@ -98,11 +98,11 @@ class RequestController extends Controller
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
             'izrakstitais_daudzums' => 'nullable|integer',
-            'pazinojuma_datums' => 'nullable|date_format:d/m/Y', // Add format if it's a date
+            'pazinojuma_datums' => 'nullable|string', // Add format if it's a date
             'statuss' => 'nullable|in:Pasūtīts,Atcelts,Mainīta piegāde,Ir noliktavā,Daļēji atlikumā',
             'aizliegums' => 'nullable|in:Drīkst aizvietot,Nedrīkst aizvietot,NVD,Stacionārs',
             'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta',
-            'piegades_datums' => 'nullable|date_format:d/m/Y', // Add format if it's a date
+            'piegades_datums' => 'nullable|string', // Add format if it's a date
             'piezimes' => 'nullable|string',
             // Add 'completed' to validation, it's boolean, not part of date issue
             'completed' => 'nullable|boolean', 
@@ -111,14 +111,6 @@ class RequestController extends Controller
         // --- NEW CONVERSION STEP ---
         // Convert the 'datums' string from 'd/m/Y' to a Carbon object
         $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
-        // Do the same for other date fields if they are present in $validated and using d/m/Y
-        if (isset($validated['pazinojuma_datums']) && $validated['pazinojuma_datums']) {
-             $validated['pazinojuma_datums'] = Carbon::createFromFormat('d/m/Y', $validated['pazinojuma_datums'])->format('Y-m-d');
-        }
-        if (isset($validated['piegades_datums']) && $validated['piegades_datums']) {
-             $validated['piegades_datums'] = Carbon::createFromFormat('d/m/Y', $validated['piegades_datums'])->format('Y-m-d');
-        }
-        // --- END NEW CONVERSION STEP ---
 
 
         // Logic for completion (keep this as is)
@@ -128,6 +120,10 @@ class RequestController extends Controller
             $validated['completed'] = true;
             $validated['completed_at'] = now();
             $validated['who_completed'] = auth()->id();
+        }else {
+            $validated['completed'] = false;
+            $validated['completed_at'] = null;
+            $validated['who_completed'] = null;
         }
         
         $requestItem->update($validated);

@@ -160,6 +160,9 @@
             <div class="me-3" id="izpilditContainer" style="display: none;">
             <button type="button" class="btn btn-success" id="izpilditBtn">Izpildīt</button>
             </div>
+            <div class="me-3" id="undoContainer" style="display: none;">
+            <button type="button" class="btn btn-warning" id="undoBtn">Atcelt izpildi</button>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Aizvērt"></button>
         </div>
         </div>
@@ -307,6 +310,7 @@
     const modalTitle = document.getElementById('requestModalLabel');
     const saveBtn = document.getElementById('requestModalSaveBtn');
     const izpilditBtn = document.getElementById('izpilditBtn');
+    const undoBtn = document.getElementById('undoBtn');
     
     // Inputs
     const aptiekasNameInput = document.getElementById('aptiekas_name');
@@ -425,8 +429,10 @@
         // Handle Completed/Uncompleted Checkboxes
         if (data.completed === '1') {
             document.getElementById('izpilditContainer').style.display = 'none';
+            document.getElementById('undoContainer').style.display = 'block';
         } else {
             document.getElementById('izpilditContainer').style.display = 'block';
+            document.getElementById('undoContainer').style.display = 'none';
         }
 
         // UI Changes
@@ -472,6 +478,17 @@
             completedInput.type = 'hidden';
             completedInput.name = 'completed';
             completedInput.value = '1';
+            form.appendChild(completedInput);
+            form.submit();
+        }
+    });
+    undoBtn.addEventListener('click', function() {
+        if (confirm('Vai tiešām vēlaties atgriezt šo pieprasījumu uz neizpildītu statusu?')) {
+            const form = document.getElementById('requestForm');
+            const completedInput = document.createElement('input');
+            completedInput.type = 'hidden';
+            completedInput.name = 'uncompleted';
+            completedInput.value = '0';
             form.appendChild(completedInput);
             form.submit();
         }
