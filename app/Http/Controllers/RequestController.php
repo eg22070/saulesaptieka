@@ -14,17 +14,16 @@ class RequestController extends Controller
     {
         $query = Requests::with(['aptiekas', 'artikuli']);
         $status_filter = $request->input('status_filter'); // Add this line
-        if ($search = $request->input('search')) {
-            $query->where(function($q) use ($search) {
-                $q->whereHas('aptiekas', function($q2) use ($search) {
-                    $q2->where('nosaukums', 'like', "%$search%");
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->whereHas('aptiekas', function($q) use ($searchTerm) {
+                    $q->where('nosaukums', 'like', "%{$searchTerm}%");
                 })
-                ->orWhereHas('artikuli', function($q3) use ($search) {
-                    $q3->where('valsts', 'like', "%$search%")
-                    ->orWhere('id_numurs', 'like', "%$search%")
-                    ->orWhere('nosaukums', 'like', "%$search%");
+                ->orWhereHas('artikuli', function($q) use ($searchTerm) {
+                    $q->where('nosaukums', 'like', "%{$searchTerm}%");
                 })
-                ->orWhere('iepircejs', 'like', "%$search%");
+                ->orWhere('iepircejs', 'like', "%{$searchTerm}%");
             });
         }
         if ($status = $request->input('status_filter')) {
@@ -38,9 +37,11 @@ class RequestController extends Controller
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
         $aptiekas = Pharmacy::all();
-        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(20);
+        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(10);
 
-        
+        if ($request->ajax()) {
+            return view('partials.pieprasijumi-table', compact('pieprasijumi'))->render();
+        }
 
         return view('pieprasijumi.index', compact('pieprasijumi', 'aptiekas', 'artikuli', 'status_filter'));
     }

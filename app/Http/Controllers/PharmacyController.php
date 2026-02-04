@@ -12,15 +12,20 @@ class PharmacyController extends Controller
         $query = Pharmacy::query();
 
         // Search functionality
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where('nosaukums', 'like', '%' . $search . '%')
-                  ->orWhere('adrese', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('nosaukums', 'like', '%' . $search . '%')
+                ->orWhere('adrese', 'like', '%' . $search . '%');
+            });
         }
 
         // Sort by name in alphabetical order
         $pharmacies = $query->orderBy('nosaukums')->paginate(30);
 
+        if ($request->ajax()) {
+            return view('partials.pharmacies-table', compact('pharmacies'))->render();
+        }
         return view('pharmacies.index', compact('pharmacies'));
     }
 

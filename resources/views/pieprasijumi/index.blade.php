@@ -19,9 +19,9 @@
 
     <div class="container" style="width: 90%; max-width: 2200px; margin: 0 auto;">
         <!-- Search -->
-        <form method="GET" action="{{ route('pieprasijumi.index') }}" class="mb-3 mt-3">
+        <form method="GET" action="{{ route('pieprasijumi.index') }}" class="mb-3 mt-3" id="searchForm">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Meklēt pēc aptiekas, artikula vai iepircēja" value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Meklēt pēc aptiekas, artikula vai iepircēja" value="{{ request('search') }}" id="searchInput">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">Meklēt</button>
                 </div>
@@ -51,99 +51,9 @@
         
 
         <!-- Table -->
-        <table class="table table-striped" style="table-layout: fixed; border-collapse: collapse; width: 100%; overflow-wrap: break-word;">
-            <thead>
-                <tr>
-                    <th style="width: 3%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
-                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
-                    <th style="width: 12%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aptieka</th>
-                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
-                    <th style="width: 10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ID numurs</th>
-                    <th style="width: 27%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
-                    <th style="width: 7%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Daudzums</th>
-                    <th style="width: 9%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Izraks. daudz.</th>
-                    <th style="width: 7%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Statuss</th>
-                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aizliegums</th>
-                    <th style="width: 6%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($pieprasijumi as $art)
-                    <!-- Main Row -->
-                    <tr>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
-                            <!-- Status Indicator (Now Clickable) -->
-                            <span class="status-indicator toggle-details" 
-                            style="background-color: {{ $art->completed ? 'green' : 'red' }};" 
-                            title="Klikšķiniet, lai redzētu detaļas"></span>
-                        </td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums->format('d/m/Y') }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;"><b>{{ $art->artikuli->nosaukums }}</b></td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->statuss }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->aizliegums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
-                            <!-- Edit Button -->
-                            <button class="btn btn-sm btn-primary edit-request-btn" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#requestModal"
-                                    data-id="{{ $art->id }}"
-                                    data-datums="{{ $art->datums }}"
-                                    data-aptiekas_id="{{ $art->aptiekas->id }}"
-                                    data-aptiekas_nosaukums="{{ $art->aptiekas->nosaukums }}" 
-                                    data-artikula_id="{{ $art->artikuli->id }}"
-                                    data-artikula_nosaukums="{{ $art->artikuli->nosaukums }}" 
-                                    data-daudzums="{{ $art->daudzums }}"
-                                    data-izrakstitais_daudzums="{{ $art->izrakstitais_daudzums }}"
-                                    data-pazinojuma_datums="{{ $art->pazinojuma_datums }}"
-                                    data-statuss="{{ $art->statuss }}"
-                                    data-aizliegums="{{ $art->aizliegums }}"
-                                    data-iepircejs="{{ $art->iepircejs }}"
-                                    data-piegades_datums="{{ $art->piegades_datums }}"
-                                    data-piezimes="{{ $art->piezimes }}"
-                                    data-completed="{{ $art->completed ? '1' : '0' }}"
-                                    data-edit-mode="true">
-                                    Labot</button>
-
-                            <!-- Delete Form -->
-                            <form action="{{ route('pieprasijumi.destroy', $art->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Vai tiešām vēlaties dzēst šo pieprasījumu?')">Dzēst</button>
-                            </form>
-                        </td>
-                    </tr>
-                    
-                    <!-- Additional Info Row (Hidden by default) -->
-                    <tr class="additional-info" style="display:none;">
-                        <td colspan="11" style="background-color: #f8f9fa; border: 1px solid #080000ff;">
-                            <div style="padding: 10px;">
-                                <strong>Paziņojuma datums:</strong> {{ $art->pazinojuma_datums }} <br>
-                                <strong>Iepircējs:</strong> {{ $art->iepircejs }} <br>
-                                <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
-                                <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
-                                <strong>Izpildīja:</strong> 
-                                @if($art->completer)
-                                    {{ $art->completer->name }} ({{ $art->completed_at ? $art->completed_at->format('d/m/Y H:i') : '' }})
-                                @else
-                                     <!-- Or leave blank if you prefer -->
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="11">Netika atrasti pieprasījumi!</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        {{ $pieprasijumi->links() }}
+        <div id="searchResults">
+            @include('partials.pieprasijumi-table', ['pieprasijumi' => $pieprasijumi])
+        </div>
     </div>
 
 <!-- Pieprasījumi Modal -->
@@ -272,35 +182,9 @@
 </x-app-layout>
 
 <style>
-    .status-indicator {
-        display: inline-block;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        cursor: pointer;
-        /* Initial state, add transition for smoothness */
-        transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; 
-        border: 2px solid transparent; /* Start with a transparent border */
-    }
-
-    .status-indicator:hover {
-        /* Example: slightly darken the color on hover */
-        filter: brightness(85%); /* Makes color slightly darker */
-        /* Example: Add a border */
-        border: 2px solid rgba(0, 0, 0, 0.3); /* A subtle dark border */
-        /* Example: Or a soft shadow */
-        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2); 
-    }
-    
-    /* If you want different hover effects for green vs. red */
-    .status-indicator[style*="background-color: green"]:hover {
-        filter: brightness(90%); /* Slightly less darken for green */
-        border: 2px solid rgba(0, 128, 0, 0.5); /* Green border */
-    }
-
-    .status-indicator[style*="background-color: red"]:hover {
-        filter: brightness(90%); /* Slightly less darken for red */
-        border: 2px solid rgba(255, 0, 0, 0.5); /* Red border */
+    .toggle-details:hover {
+        background-color: #e9ecef; /* Light grey hover */
+        color: #0d6efd; /* Bootstrap primary blue */
     }
 </style>
 
@@ -311,14 +195,43 @@
     const saveBtn = document.getElementById('requestModalSaveBtn');
     const izpilditBtn = document.getElementById('izpilditBtn');
     const undoBtn = document.getElementById('undoBtn');
-    
+
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    const resultsContainer = document.getElementById('searchResults');
+
+    let debounceTimer;
     // Inputs
     const aptiekasNameInput = document.getElementById('aptiekas_name');
     const aptiekasIdInput = document.getElementById('aptiekas_id');
     const artikulaNameInput = document.getElementById('artikula_name');
     const artikulaIdInput = document.getElementById('artikula_id');
     const additionalFields = document.getElementById('additionalFields');
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+            const searchTerm = searchInput.value;
+            fetchResults(searchTerm);
+        }, 300); // Wait for 300ms after the user stops typing
+    });
 
+    function fetchResults(searchTerm) {
+        const url = `${searchForm.action}?search=${encodeURIComponent(searchTerm)}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            resultsContainer.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
     // Initialize Date Picker
     flatpickr("#datums", {
         dateFormat: "d/m/Y" 
@@ -391,9 +304,14 @@
     // ---------------------------------------------------------
     // "EDIT" BUTTON LOGIC
     // ---------------------------------------------------------
-    document.querySelectorAll('.edit-request-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const data = this.dataset;
+    document.addEventListener('click', function (event) {
+        const btn = event.target.closest('.edit-request-btn');
+        if (!btn) return;           // click is not on an edit button
+        if (!form) return;          // safety
+
+        const data = btn.dataset;
+
+        // Set form action
         form.action = "/pieprasijumi/" + data.id;
 
         // Populate Hidden IDs
@@ -401,30 +319,29 @@
         artikulaIdInput.value = data.artikula_id;
 
         // Populate Visible Text Inputs
-        aptiekasNameInput.value = data.aptiekas_nosaukums; 
-        artikulaNameInput.value = data.artikula_nosaukums;
+        aptiekasNameInput.value  = data.aptiekas_nosaukums;
+        artikulaNameInput.value  = data.artikula_nosaukums;
 
         // Ensure _method="PUT" exists
         let methodInput = form.querySelector('input[name="_method"]');
         if (!methodInput) {
-          methodInput = document.createElement('input');
-          methodInput.type = 'hidden';
-          methodInput.name = '_method';
-          form.appendChild(methodInput);
+            methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            form.appendChild(methodInput);
         }
         methodInput.value = 'PUT';
 
         // Populate Form Fields
-        // Note: data.datums usually comes from DB as YYYY-MM-DD, we need DD/MM/YYYY for input
-        document.getElementById('datums').value = formatDateForInput(data.datums);
-        document.getElementById('daudzums').value = data.daudzums;
+        document.getElementById('datums').value                = formatDateForInput(data.datums);
+        document.getElementById('daudzums').value              = data.daudzums;
         document.getElementById('izrakstitais_daudzums').value = data.izrakstitais_daudzums;
-        document.getElementById('pazinojuma_datums').value = data.pazinojuma_datums;
-        document.getElementById('statuss').value = data.statuss;
-        document.getElementById('aizliegums').value = data.aizliegums;
-        document.getElementById('iepircejs').value = data.iepircejs;
-        document.getElementById('piegades_datums').value = data.piegades_datums;
-        document.getElementById('piezimes').value = data.piezimes;
+        document.getElementById('pazinojuma_datums').value     = data.pazinojuma_datums;
+        document.getElementById('statuss').value               = data.statuss;
+        document.getElementById('aizliegums').value            = data.aizliegums;
+        document.getElementById('iepircejs').value             = data.iepircejs;
+        document.getElementById('piegades_datums').value       = data.piegades_datums;
+        document.getElementById('piezimes').value              = data.piezimes;
 
         // Handle Completed/Uncompleted Checkboxes
         if (data.completed === '1') {
@@ -440,28 +357,26 @@
         modalTitle.textContent = 'Labot pieprasījumu';
         saveBtn.textContent = 'Atjaunināt';
       });
-    });
 
     // ---------------------------------------------------------
     // ROW EXPANSION LOGIC (Red/Green Circle Click)
     // ---------------------------------------------------------
-    document.querySelectorAll('.toggle-details').forEach(indicator => {
-        indicator.addEventListener('click', function (event) {
-            event.stopPropagation();
+    document.addEventListener('click', function (event) {
+        const indicator = event.target.closest('.toggle-details');
+        if (!indicator) return;
 
-            const mainRow = this.closest('tr');
-            const additionalRow = mainRow.nextElementSibling;
+        event.stopPropagation();
 
-            if (additionalRow && additionalRow.classList.contains('additional-info')) {
-                if (additionalRow.style.display === 'none') {
-                    additionalRow.style.display = 'table-row';
-                } else {
-                    additionalRow.style.display = 'none';
-                }
-            }
-        });
+        const mainRow = indicator.closest('tr');
+        const additionalRow = mainRow.nextElementSibling;
+
+        if (additionalRow && additionalRow.classList.contains('additional-info')) {
+            additionalRow.style.display =
+                additionalRow.style.display === 'none' || additionalRow.style.display === ''
+                    ? 'table-row'
+                    : 'none';
+        }
     });
-
     // ---------------------------------------------------------
     // FILTER RADIO BUTTONS
     // ---------------------------------------------------------
@@ -472,7 +387,6 @@
     });
   });
   izpilditBtn.addEventListener('click', function() {
-        if (confirm('Vai tiešām vēlaties izpildīt šo ierakstu?')) {
             const form = document.getElementById('requestForm');
             const completedInput = document.createElement('input');
             completedInput.type = 'hidden';
@@ -480,10 +394,9 @@
             completedInput.value = '1';
             form.appendChild(completedInput);
             form.submit();
-        }
     });
     undoBtn.addEventListener('click', function() {
-        if (confirm('Vai tiešām vēlaties atgriezt šo pieprasījumu uz neizpildītu statusu?')) {
+
             const form = document.getElementById('requestForm');
             const completedInput = document.createElement('input');
             completedInput.type = 'hidden';
@@ -491,6 +404,5 @@
             completedInput.value = '0';
             form.appendChild(completedInput);
             form.submit();
-        }
     });
 </script>

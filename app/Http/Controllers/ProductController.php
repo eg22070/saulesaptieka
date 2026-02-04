@@ -12,15 +12,20 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $searchTerm = $request->input('search');
-        $products = Product::query()
-        ->when($searchTerm, function ($query, $searchTerm) {
-            return $query->where('nosaukums', 'like', "%$searchTerm%")
-                         ->orWhere('id_numurs', 'like', "%$searchTerm%")
-                         ->orWhere('valsts', 'like', "%$searchTerm%")
-                         ->orWhere('snn', 'like', "%$searchTerm%");
-        })
-        ->paginate(30);
+        $query = Product::query();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nosaukums', 'like', "%{$search}%")
+                ->orWhere('id_numurs', 'like', "%{$search}%")
+                ->orWhere('valsts', 'like', "%{$search}%");
+            });
+        }
+        $products = $query->orderBy('nosaukums')->paginate(30);
+
+        if ($request->ajax()) {
+            return view('partials.artikuli-table', compact('products'))->render();
+        }
 
         return view('artikuli.index', compact('products'));
     }
@@ -42,14 +47,14 @@ class ProductController extends Controller
             'nosaukums' => 'required|string|max:255',
             'id_numurs' => 'nullable|string|max:255',
             'valsts' => 'nullable|string|max:255',
-            'snn' => 'nullable|string|max:255',
+            'snn' => 'nullable|string',
             'analogs' => 'nullable|string|max:255',
             'atzimes' => 'nullable|string',
         ]);
 
         Product::create($validated);
 
-        return redirect()->route('artikuli.index')->with('success', 'Produkts veiksmīgi pievienots');
+        return redirect()->route('artikuli.index')->with('success', 'Artikuls veiksmīgi pievienots');
     }
 
     /**
@@ -79,7 +84,7 @@ class ProductController extends Controller
             'nosaukums' => 'required|string|max:255',
             'id_numurs' => 'nullable|string|max:255',
             'valsts' => 'nullable|string|max:255',
-            'snn' => 'nullable|string|max:255',
+            'snn' => 'nullable|string',
             'analogs' => 'nullable|string|max:255',
             'atzimes' => 'nullable|string',
         ]);
@@ -87,7 +92,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->update($validated);
 
-        return redirect()->route('artikuli.index')->with('success', 'Produkts veiksmīgi atjaunināts');
+        return redirect()->route('artikuli.index')->with('success', 'Artikuls veiksmīgi atjaunināts');
     }
 
     /**
@@ -98,6 +103,6 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return redirect()->route('artikuli.index')->with('success', 'Produkts dzēsts');
+        return redirect()->route('artikuli.index')->with('success', 'Artikuls dzēsts');
     }
 }
