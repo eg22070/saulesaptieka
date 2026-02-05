@@ -121,6 +121,15 @@
                 <label for="daudzums" class="form-label mr-3" style="white-space: nowrap;">Daudzums</label>
                 <input type="number" class="form-control" id="daudzums" name="daudzums" style="width: 100px;" required>
             </div>
+            <div class="mb-2 d-flex align-items-center">
+                <label for="aizliegums" class="form-label mr-3">Aizliegums</label>
+                <select class="form-control" id="aizliegums" name="aizliegums" style="width: 200px;">
+                    <option value="Drīkst aizvietot">Drīkst aizvietot</option>
+                    <option value="Nedrīkst aizvietot">Nedrīkst aizvietot</option>
+                    <option value="NVD">NVD</option>
+                    <option value="Stacionārs">Stacionārs</option>
+                </select>
+            </div>
             <div id="additionalFields" style="display:none;">
             <div class="mb-2 d-flex align-items-center">
                 <label for="izrakstitais_daudzums" class="form-label mr-3" style="white-space: nowrap;">Izrakstītais daudzums</label>
@@ -141,16 +150,7 @@
                     <option value="Daļēji atlikumā">Daļēji atlikumā</option>
                 </select>
             </div>
-            <div class="mb-2 d-flex align-items-center">
-                <label for="aizliegums" class="form-label mr-3">Aizliegums</label>
-                <select class="form-control" id="aizliegums" name="aizliegums" style="width: 200px;">
-                    <option value>Izvēlieties aizliegumu</option>
-                    <option value="Drīkst aizvietot">Drīkst aizvietot</option>
-                    <option value="Nedrīkst aizvietot">Nedrīkst aizvietot</option>
-                    <option value="NVD">NVD</option>
-                    <option value="Stacionārs">Stacionārs</option>
-                </select>
-            </div>
+            
             <div class="mb-2 d-flex align-items-center">
                 <label for="iepircejs" class="form-label mr-3">Iepircējs</label>
                 <select class="form-control" id="iepircejs" name="iepircejs" style="width: 200px;">
@@ -400,7 +400,7 @@
             const form = document.getElementById('requestForm');
             const completedInput = document.createElement('input');
             completedInput.type = 'hidden';
-            completedInput.name = 'uncompleted';
+            completedInput.name = 'completed';
             completedInput.value = '0';
             form.appendChild(completedInput);
             form.submit();

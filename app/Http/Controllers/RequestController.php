@@ -113,21 +113,24 @@ class RequestController extends Controller
         // Convert the 'datums' string from 'd/m/Y' to a Carbon object
         $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
-
+        $requestItem->update($validated);
         // Logic for completion (keep this as is)
         $isCompleted = $request->has('completed') && $request->completed == '1';
         
-        if ($request->has('completed') && $request->completed == '1') {
-            $validated['completed'] = true;
-            $validated['completed_at'] = now();
-            $validated['who_completed'] = auth()->id();
-        }else {
-            $validated['completed'] = false;
-            $validated['completed_at'] = null;
-            $validated['who_completed'] = null;
+        if ($request->has('completed')) {
+            if ($request->completed == '1') {
+                $requestItem->completed      = true;
+                $requestItem->completed_at   = now();
+                $requestItem->who_completed  = auth()->id();
+            } else { // completed == '0'
+                $requestItem->completed      = false;
+                $requestItem->completed_at   = null;
+                $requestItem->who_completed  = null;
+            }
+            $requestItem->save();
         }
         
-        $requestItem->update($validated);
+        
         
         return redirect()->route('pieprasijumi.index')->with('success', 'Pieprasījums veiksmīgi atjaunināts');
     }
