@@ -135,21 +135,22 @@
     white-space: nowrap;
 }
 
-/* Default styles */
+/* Default styles 
 .badge-status   { background-color: #e0f5e5; color: #1b5e20; border-color: #1b5e20; }
 .badge-aizliegums { background-color: #e0ecff; color: #1a237e; border-color: #1a237e; }
 .badge-buyer    { background-color: #f5f5f5; color: #424242; border-color: #9e9e9e; }
 
-/* Per-status colors (slugged variants) */
+ Per-status colors (slugged variants) 
 .badge-status-pasutits        { background-color: #4caf50; color: #fff; border-color: #2e7d32; }
 .badge-status-atcelts         { background-color: #ffcdd2; color: #b71c1c; border-color: #b71c1c; }
 .badge-status-mainita-piegade { background-color: #fff3e0; color: #ef6c00; border-color: #ef6c00; }
 .badge-status-ir-noliktava    { background-color: #bbdefb; color: #0d47a1; border-color: #0d47a1; }
 .badge-status-daleji-atlikuma { background-color: #fff9c4; color: #f9a825; border-color: #f9a825; }
 
-/* Per-aizliegums colors */
+ Per-aizliegums colors 
 .badge-aizliegums-drikst-aizvietot   { background-color: #d1eaff; color: #003c8f; border-color: #003c8f; }
 .badge-aizliegums-nedrikst-aizvietot { background-color: #ffebee; color: #b71c1c; border-color: #b71c1c; }
 .badge-aizliegums-nvd               { background-color: #e8f5e9; color: #1b5e20; border-color: #1b5e20; }
 .badge-aizliegums-stacionars        { background-color: #ede7f6; color: #4a148c; border-color: #4a148c; }
+*/
 </style>
