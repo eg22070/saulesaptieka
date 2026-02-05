@@ -64,7 +64,7 @@
             </div>
             <div class="mb-3">
                 <label for="id_numurs" class="form-label">ID numurs</label>
-                <input type="text" class="form-control" id="id_numurs" name="id_numurs" required>
+                <input type="text" class="form-control" id="id_numurs" name="id_numurs">
             </div>
             <div class="mb-3">
                 <label for="valsts" class="form-label">Valsts</label>
