@@ -38,9 +38,23 @@
                 </td>
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->aizliegums }}</td>
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->statuss }}</td>
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->iepircejs }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                    <span class="badge-pill badge-aizliegums badge-aizliegums-{{ Str::slug($art->aizliegums) }}">
+                        {{ $art->aizliegums }}
+                    </span>
+                </td>
+
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                    <span class="badge-pill badge-status badge-status-{{ Str::slug($art->statuss) }}">
+                        {{ $art->statuss }}
+                    </span>
+                </td>
+
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                    <span class="badge-pill badge-buyer">
+                        {{ $art->iepircejs }}
+                    </span>
+                </td>
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
                             <!-- Edit Button -->
                             <button class="btn btn-sm btn-primary edit-request-btn" 
@@ -111,4 +125,31 @@
     .custom-requests-table .request-row:hover {
         background-color: #b0e6ee !important;
     }
+    .badge-pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;      /* pill shape */
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+/* Default styles */
+.badge-status   { background-color: #e0f5e5; color: #1b5e20; border-color: #1b5e20; }
+.badge-aizliegums { background-color: #e0ecff; color: #1a237e; border-color: #1a237e; }
+.badge-buyer    { background-color: #f5f5f5; color: #424242; border-color: #9e9e9e; }
+
+/* Per-status colors (slugged variants) */
+.badge-status-pasutits        { background-color: #4caf50; color: #fff; border-color: #2e7d32; }
+.badge-status-atcelts         { background-color: #ffcdd2; color: #b71c1c; border-color: #b71c1c; }
+.badge-status-mainita-piegade { background-color: #fff3e0; color: #ef6c00; border-color: #ef6c00; }
+.badge-status-ir-noliktava    { background-color: #bbdefb; color: #0d47a1; border-color: #0d47a1; }
+.badge-status-daleji-atlikuma { background-color: #fff9c4; color: #f9a825; border-color: #f9a825; }
+
+/* Per-aizliegums colors */
+.badge-aizliegums-drikst-aizvietot   { background-color: #d1eaff; color: #003c8f; border-color: #003c8f; }
+.badge-aizliegums-nedrikst-aizvietot { background-color: #ffebee; color: #b71c1c; border-color: #b71c1c; }
+.badge-aizliegums-nvd               { background-color: #e8f5e9; color: #1b5e20; border-color: #1b5e20; }
+.badge-aizliegums-stacionars        { background-color: #ede7f6; color: #4a148c; border-color: #4a148c; }
 </style>
