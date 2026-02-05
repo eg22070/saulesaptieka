@@ -25,9 +25,7 @@
                         <span style="font-size: 1.2rem;">✅</span>
                     @endif
                 </td>
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
-                    {{ $art->created_at->format('d/m/Y') }}
-                </td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums->format('d/m/Y') }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>

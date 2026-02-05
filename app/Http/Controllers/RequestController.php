@@ -49,7 +49,7 @@ class RequestController extends Controller
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
         $aptiekas = Pharmacy::all();
-        $pieprasijumi = $query->orderBy('created_at', 'asc')->paginate(50);
+        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(50);
 
         if ($request->ajax()) {
             return view('partials.pieprasijumi-table', compact('pieprasijumi'))->render();
@@ -68,6 +68,7 @@ class RequestController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'datums' => 'required|date_format:d/m/Y',
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -79,6 +80,7 @@ class RequestController extends Controller
             'piegades_datums' => 'nullable|string',
             'piezimes' => 'nullable|string',
         ]);
+        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
         Requests::create($validated);
 
@@ -104,6 +106,7 @@ class RequestController extends Controller
         $requestItem = Requests::findOrFail($id);
         
         $validated = $request->validate([
+            'datums' => 'required|date_format:d/m/Y', // Validation is correct
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -120,6 +123,7 @@ class RequestController extends Controller
 
         // --- NEW CONVERSION STEP ---
         // Convert the 'datums' string from 'd/m/Y' to a Carbon object
+        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
         $requestItem->update($validated);
         // Logic for completion (keep this as is)

@@ -100,6 +100,10 @@
         </div>
 
         <div class="modal-body">
+            <div class="mb-2">
+                <label for="datums" class="form-label mr-3">Datums</label>
+                <input type="text" id="datums" name="datums" placeholder="DD/MM/YYYY" required>
+            </div>
             <div class="mb-2 d-flex align-items-center">
                 <label for="aptiekas_name" class="form-label mr-3">Aptieka</label>
                 <!-- Input for user's visible selection -->
@@ -348,6 +352,7 @@
         methodInput.value = 'PUT';
 
         // Populate Form Fields
+        document.getElementById('datums').value                = formatDateForInput(data.datums);
         document.getElementById('daudzums').value              = data.daudzums;
         document.getElementById('izrakstitais_daudzums').value = data.izrakstitais_daudzums;
         document.getElementById('statuss').value               = data.statuss;
