@@ -21,7 +21,7 @@ class ProductController extends Controller
                 ->orWhere('valsts', 'like', "%{$search}%");
             });
         }
-        $products = $query->orderBy('nosaukums')->paginate(30);
+        $products = $query->orderBy('nosaukums')->paginate(50);
 
         if ($request->ajax()) {
             return view('partials.artikuli-table', compact('products'))->render();

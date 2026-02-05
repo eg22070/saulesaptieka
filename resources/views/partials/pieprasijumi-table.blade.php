@@ -1,41 +1,47 @@
-<table class="table table-striped">
+<table class="table custom-requests-table">
     <thead>
-                <tr>
-                    <th style="width: 3%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
-                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
-                    <th style="width: 12%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aptieka</th>
-                    <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
-                    <th style="width: 10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ID numurs</th>
-                    <th style="width: 27%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
-                    <th style="width: 7%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Daudzums</th>
-                    <th style="width: 9%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Izraks. daudz.</th>
-                    <th style="width: 7%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Statuss</th>
-                    <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aizliegums</th>
-                    <th style="width: 6%; border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($pieprasijumi as $art)
-                    <!-- Main Row -->
-                    <tr>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center; vertical-align: middle;">
-                            @if($art->completed)
-                                <span style="font-size: 1.2rem;">✅</span>
-                                <!-- You can also use a Bootstrap icon if installed: <i class="bi bi-hand-thumbs-up-fill text-success"></i> -->
-                            @endif
-                        </td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums->format('d/m/Y') }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
-                        <td class="toggle-details" style="border: 1px solid #080000ff; padding: 4px; cursor: pointer;" title="Klikšķiniet, lai redzētu detaļas">
-                            <b>{{ $art->artikuli->nosaukums }}</b>
-                        </td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->statuss }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->aizliegums }}</td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+        <tr>
+            <th style="width: 3%;  border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
+            <th style="width: 8%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
+            <th style="width: 12%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aptieka</th>
+            <th style="width: 5%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
+            <th style="width: 10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ID numurs</th>
+            <th style="width: 27%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
+            <th style="width: 5%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Sk.</th>
+            <th style="width: 5%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Izr. sk.</th>
+            <th style="width: 8%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Aizliegums</th>
+            <th style="width: 7%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Statuss</th>
+            <th style="width: 6%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Iepircējs</th>
+            <th style="width: 6%;  border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse ($pieprasijumi as $art)
+            <!-- Main Row -->
+            <tr class="request-row"
+                style="background-color: {{ $loop->odd ? '#ffffff' : '#f0f0f0' }};">
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center; vertical-align: middle;">
+                    @if($art->completed)
+                        <span style="font-size: 1.2rem;">✅</span>
+                    @endif
+                </td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                    {{ $art->created_at->format('d/m/Y') }}
+                </td>
+                <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
+                <td class="toggle-details"
+                    style="border: 1px solid #080000ff; padding: 4px; cursor: pointer;"
+                    title="Klikšķiniet, lai redzētu detaļas">
+                    <b>{{ $art->artikuli->nosaukums }}</b>
+                </td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->aizliegums }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->statuss }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->iepircejs }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
                             <!-- Edit Button -->
                             <button class="btn btn-sm btn-primary edit-request-btn" 
                                     data-bs-toggle="modal" 
@@ -69,15 +75,14 @@
                     
                     <!-- Additional Info Row (Hidden by default) -->
                     <tr class="additional-info" style="display:none;">
-                        <td colspan="11" style="background-color: #f8f9fa; border: 1px solid #080000ff;">
+                        <td colspan="12" style="background-color: #f8f9fa; border: 1px solid #080000ff;">
                             <div style="padding: 10px;">
-                                <strong>Paziņojuma datums:</strong> {{ $art->pazinojuma_datums }} <br>
-                                <strong>Iepircējs:</strong> {{ $art->iepircejs }} <br>
-                                <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
                                 <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
-                                <strong>Izpildīja:</strong> 
+                                <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
+                                <strong>Izpildīja:</strong>
+
                                 @if($art->completer)
-                                    {{ $art->completer->name }} ({{ $art->completed_at ? $art->completed_at->format('d/m/Y H:i') : '' }})
+                                    {{ $art->completer->name }} ({{ $art->completed_at ? $art->completed_at->format('d/m/Y') : '' }})
                                 @else
                                      <!-- Or leave blank if you prefer -->
                                 @endif
@@ -92,3 +97,18 @@
             </tbody>
 </table>
 {{ $pieprasijumi->links() }}
+<style>
+    /* Header background */
+    .custom-requests-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2; 
+        background-color: #373330;
+        color: #ffffff;
+    }
+
+    /* Hover color for main rows */
+    .custom-requests-table .request-row:hover {
+        background-color: #b0e6ee !important;
+    }
+</style>

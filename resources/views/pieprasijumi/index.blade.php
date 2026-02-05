@@ -18,6 +18,7 @@
     </x-slot>
 
     <div class="container" style="width: 90%; max-width: 2200px; margin: 0 auto;">
+        <div class="search-filter-sticky">
         <!-- Search -->
         <form method="GET" action="{{ route('pieprasijumi.index') }}" class="mb-3 mt-3" id="searchForm">
             <div class="input-group">
@@ -30,20 +31,41 @@
         <!-- Filter by completion status -->
 
     <div class="mb-3">
-        <form method="GET" action="{{ route('pieprasijumi.index') }}">
+        <form method="GET" action="{{ route('pieprasijumi.index') }}" id="filtersForm">
+            {{-- Status filter --}}
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status_filter" id="all" value="" {{ request('status_filter') ? '' : 'checked' }}>
-                <label class="form-check-label" for="all">Visi</label>
+                <label class="form-label me-2 mr-3" for="status_filter">Statuss:</label>
+                <select name="status_filter" id="status_filter" class="form-select form-select-sm">
+                    <option value="" {{ request('status_filter') == '' ? 'selected' : '' }}>Visi</option>
+                    <option value="completed"  {{ request('status_filter') == 'completed'  ? 'selected' : '' }}>Pabeigtie</option>
+                    <option value="incomplete" {{ request('status_filter') == 'incomplete' ? 'selected' : '' }}>Nepabeigtie</option>
+                </select>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status_filter" id="completed" value="completed" {{ request('status_filter') == 'completed' ? 'checked' : '' }}>
-                <label class="form-check-label" for="completed">Pabeigtie</label>
+
+            {{-- Pharmacy filter --}}
+            <div class="form-check form-check-inline ms-4">
+                <label class="form-label me-2 mr-3" for="pharmacy_filter">Aptieka:</label>
+                <select name="pharmacy_filter" id="pharmacy_filter" class="form-select form-select-sm">
+                    <option value="" {{ request('pharmacy_filter') == '' ? 'selected' : '' }}>Visas aptiekas</option>
+                    <option value="saule10" {{ request('pharmacy_filter') == 'saule10' ? 'selected' : '' }}>
+                        Saule-10 (SIA Saules aptieka)
+                    </option>
+                </select>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status_filter" id="incomplete" value="incomplete" {{ request('status_filter') == 'incomplete' ? 'checked' : '' }}>
-                <label class="form-check-label" for="incomplete">Nepabeigtie</label>
+
+            {{-- Buyer filter --}}
+            <div class="form-check form-check-inline ms-4">
+                <label class="form-label me-2 mr-3" for="buyer_filter">Iepircējs:</label>
+                <select name="buyer_filter" id="buyer_filter" class="form-select form-select-sm">
+                    <option value="" {{ request('buyer_filter') == '' ? 'selected' : '' }}>Visi iepircēji</option>
+                    <option value="Artūrs" {{ request('buyer_filter') == 'Artūrs' ? 'selected' : '' }}>Artūrs</option>
+                    <option value="Liene"  {{ request('buyer_filter') == 'Liene'  ? 'selected' : '' }}>Liene</option>
+                    <option value="Anna"   {{ request('buyer_filter') == 'Anna'   ? 'selected' : '' }}>Anna</option>
+                    <option value="Iveta"  {{ request('buyer_filter') == 'Iveta'  ? 'selected' : '' }}>Iveta</option>
+                </select>
             </div>
         </form>
+    </div>
     </div>
         <!-- Add Button -->
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#requestModal" id="addRequestBtn">Pievienot jaunu pieprasījumu</button>
@@ -78,10 +100,6 @@
         </div>
 
         <div class="modal-body">
-            <div class="mb-2">
-                <label for="datums" class="form-label mr-3">Datums</label>
-                <input type="text" id="datums" name="datums" placeholder="DD/MM/YYYY" required>
-            </div>
             <div class="mb-2 d-flex align-items-center">
                 <label for="aptiekas_name" class="form-label mr-3">Aptieka</label>
                 <!-- Input for user's visible selection -->
@@ -135,10 +153,7 @@
                 <label for="izrakstitais_daudzums" class="form-label mr-3" style="white-space: nowrap;">Izrakstītais daudzums</label>
                 <input type="number" class="form-control" id="izrakstitais_daudzums" name="izrakstitais_daudzums" style="width: 100px;">
             </div>
-            <div class="mb-2 d-flex align-items-center">
-                <label for="pazinojuma_datums" class="form-label mr-3" style="white-space: nowrap;">Paziņojuma datums</label>
-                <textarea class="form-control" id="pazinojuma_datums" name="pazinojuma_datums" rows="1"></textarea>
-            </div>
+
             <div class="mb-2 d-flex align-items-center">
                 <label for="statuss" class="form-label mr-3">Statuss</label>
                 <select class="form-control" id="statuss" name="statuss" style="width: 200px;">
@@ -183,9 +198,9 @@
 
 <style>
     .toggle-details:hover {
-        background-color: #e9ecef; /* Light grey hover */
         color: #0d6efd; /* Bootstrap primary blue */
     }
+
 </style>
 
 <script>
@@ -333,10 +348,8 @@
         methodInput.value = 'PUT';
 
         // Populate Form Fields
-        document.getElementById('datums').value                = formatDateForInput(data.datums);
         document.getElementById('daudzums').value              = data.daudzums;
         document.getElementById('izrakstitais_daudzums').value = data.izrakstitais_daudzums;
-        document.getElementById('pazinojuma_datums').value     = data.pazinojuma_datums;
         document.getElementById('statuss').value               = data.statuss;
         document.getElementById('aizliegums').value            = data.aizliegums;
         document.getElementById('iepircejs').value             = data.iepircejs;
@@ -380,10 +393,18 @@
     // ---------------------------------------------------------
     // FILTER RADIO BUTTONS
     // ---------------------------------------------------------
-    document.querySelectorAll('input[name="status_filter"]').forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        this.form.submit();
-      });
+    const filtersForm = document.getElementById('filtersForm');
+
+    document.getElementById('status_filter').addEventListener('change', function () {
+        filtersForm.submit();
+    });
+
+    document.getElementById('pharmacy_filter').addEventListener('change', function () {
+        filtersForm.submit();
+    });
+
+    document.getElementById('buyer_filter').addEventListener('change', function () {
+        filtersForm.submit();
     });
   });
   izpilditBtn.addEventListener('click', function() {

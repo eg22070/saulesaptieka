@@ -34,10 +34,22 @@ class RequestController extends Controller
             }
             // if 'all', then no filter applied
         }
+        // Pharmacy filter
+        if ($pharmacyFilter = $request->input('pharmacy_filter')) {
+            if ($pharmacyFilter === 'saule10') {
+                // aptiekas_id = 1314 (Saule-10, SIA Saules aptieka)
+                $query->where('aptiekas_id', 1314);
+            }
+        }
+
+        // Buyer (Iepircējs) filter
+        if ($buyerFilter = $request->input('buyer_filter')) {
+            $query->where('iepircejs', $buyerFilter);
+        }
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
         $aptiekas = Pharmacy::all();
-        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(10);
+        $pieprasijumi = $query->orderBy('created_at', 'asc')->paginate(50);
 
         if ($request->ajax()) {
             return view('partials.pieprasijumi-table', compact('pieprasijumi'))->render();
@@ -56,7 +68,6 @@ class RequestController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'datums' => 'required|date_format:d/m/Y',
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -68,7 +79,6 @@ class RequestController extends Controller
             'piegades_datums' => 'nullable|string',
             'piezimes' => 'nullable|string',
         ]);
-        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
         Requests::create($validated);
 
@@ -94,7 +104,6 @@ class RequestController extends Controller
         $requestItem = Requests::findOrFail($id);
         
         $validated = $request->validate([
-            'datums' => 'required|date_format:d/m/Y', // Validation is correct
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -111,7 +120,6 @@ class RequestController extends Controller
 
         // --- NEW CONVERSION STEP ---
         // Convert the 'datums' string from 'd/m/Y' to a Carbon object
-        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
         $requestItem->update($validated);
         // Logic for completion (keep this as is)

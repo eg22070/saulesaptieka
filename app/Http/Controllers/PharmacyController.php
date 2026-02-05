@@ -21,7 +21,7 @@ class PharmacyController extends Controller
         }
 
         // Sort by name in alphabetical order
-        $pharmacies = $query->orderBy('nosaukums')->paginate(30);
+        $pharmacies = $query->orderBy('nosaukums')->paginate(50);
 
         if ($request->ajax()) {
             return view('partials.pharmacies-table', compact('pharmacies'))->render();
