@@ -20,13 +20,21 @@
     <div class="container" style="width: 90%; max-width: 2200px; margin: 0 auto;">
         <!-- Search Bar -->
         <form action="{{ route('artikuli.index') }}" method="GET" class="mb-3 mt-3" id="searchForm">
+            <div class="input-group mb-2">
+                <input type="text"
+                    id="searchInput"
+                    name="search"
+                    class="form-control"
+                    placeholder="Meklēt pēc nosaukuma, id numura vai valsts"
+                    value="{{ request('search') }}">
+            </div>
             <div class="input-group">
                 <input type="text"
-                       id="searchInput"
-                       name="search"
-                       class="form-control"
-                       placeholder="Meklēt pēc nosaukuma, id numura vai valsts"
-                       value="{{ request('search') }}">
+                    id="snnInput"
+                    name="snn"
+                    class="form-control"
+                    placeholder="Meklēt pēc SNN"
+                    value="{{ request('snn') }}">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">Meklēt</button>
                 </div>
@@ -100,25 +108,31 @@
     const saveBtn = document.getElementById('artikuliModalSaveBtn');
 
     const searchInput      = document.getElementById('searchInput');
+    const snnInput         = document.getElementById('snnInput');
     const searchForm       = document.getElementById('searchForm');
     const resultsContainer = document.getElementById('artikuliResults');
+    const searchHidden     = document.getElementById('search_hidden');
 
     let debounceTimer;
 
-    if (searchInput && searchForm && resultsContainer) {
-        searchInput.addEventListener('input', function () {
+    if (searchInput && snnInput && searchForm && resultsContainer) {
+        const triggerLiveSearch = function () {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
-                const searchTerm = searchInput.value;
-                fetchResults(searchTerm);
+                fetchResults(searchInput.value, snnInput.value);
             }, 300);
-        });
+        };
 
-        function fetchResults(searchTerm) {
-            const params = new URLSearchParams({ search: searchTerm });
+        searchInput.addEventListener('input', triggerLiveSearch);
+        snnInput.addEventListener('input', triggerLiveSearch);
+
+        function fetchResults(searchTerm, snnTerm) {
+            const params = new URLSearchParams({
+                search: searchTerm || '',
+                snn: snnTerm || ''
+            });
             const url = `${searchForm.action}?${params.toString()}`;
 
-            // keep URL in sync with live search
             window.history.replaceState({}, '', url);
 
             fetch(url, {

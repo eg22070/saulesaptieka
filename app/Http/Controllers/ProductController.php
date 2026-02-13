@@ -21,6 +21,10 @@ class ProductController extends Controller
                 ->orWhere('valsts', 'like', "%{$search}%");
             });
         }
+        if ($request->filled('snn')) {
+            $snn = $request->input('snn');
+            $query->where('snn', 'like', "%{$snn}%");
+        }
         $products = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
 
         if ($request->ajax()) {
