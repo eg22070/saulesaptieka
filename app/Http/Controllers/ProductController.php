@@ -21,7 +21,7 @@ class ProductController extends Controller
                 ->orWhere('valsts', 'like', "%{$search}%");
             });
         }
-        $products = $query->orderBy('nosaukums')->paginate(50);
+        $products = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
 
         if ($request->ajax()) {
             return view('partials.artikuli-table', compact('products'))->render();
@@ -54,7 +54,7 @@ class ProductController extends Controller
 
         Product::create($validated);
 
-        return redirect()->route('artikuli.index')->with('success', 'Artikuls veiksmīgi pievienots');
+        return redirect()->back()->with('success', 'Artikuls veiksmīgi pievienots');
     }
 
     /**
@@ -92,7 +92,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->update($validated);
 
-        return redirect()->route('artikuli.index')->with('success', 'Artikuls veiksmīgi atjaunināts');
+        return redirect()->back()->with('success', 'Artikuls veiksmīgi atjaunināts');
     }
 
     /**
@@ -103,6 +103,6 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return redirect()->route('artikuli.index')->with('success', 'Artikuls dzēsts');
+        return redirect()->back()->with('success', 'Artikuls dzēsts');
     }
 }

@@ -52,6 +52,7 @@
       <form id="artikuliForm" method="POST" action="">
         @csrf
         @method('POST') <!-- Will be overridden for editing -->
+        <input type="hidden" name="search" id="search_hidden" value="{{ request('search') }}">
 
         <div class="modal-header">
           <h5 class="modal-title" id="artikuliModalLabel">Pievienot/labot artikulu</h5>
@@ -114,21 +115,18 @@
         });
 
         function fetchResults(searchTerm) {
-            const url = `${searchForm.action}?search=${encodeURIComponent(searchTerm)}`;
+            const params = new URLSearchParams({ search: searchTerm });
+            const url = `${searchForm.action}?${params.toString()}`;
+
+            // keep URL in sync with live search
+            window.history.replaceState({}, '', url);
 
             fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(response => response.text())
-            .then(html => {
-                resultsContainer.innerHTML = html;
-                // no manual re-bind needed because we use delegation for edit buttons
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            .then(r => r.text())
+            .then(html => { resultsContainer.innerHTML = html; })
+            .catch(err => console.error(err));
         }
     }
     // Handle "Add" button click
@@ -145,14 +143,18 @@
       // Set modal title and button text
       modalTitle.textContent = 'Pievienot jaunu artikulu';
       saveBtn.textContent = 'Saglabāt';
+
+      if (searchHidden && searchInput) {
+        searchHidden.value = searchInput.value;
+    }
     });
 
     // Handle "Edit" buttons
     
     document.addEventListener('click', function (event) {
         const btn = event.target.closest('.edit-artikuls-btn');
-        if (!btn) return;          // click was not on an edit button
-        if (!form) return;         // safety
+        if (!btn) return;
+        if (!form) return;
 
         const id        = btn.dataset.id;
         const nosaukums = btn.dataset.nosaukums;
@@ -162,10 +164,8 @@
         const analogs   = btn.dataset.analogs;
         const atzimes   = btn.dataset.atzimes;
 
-        // Set form action for update
         form.action = "/artikuli/" + id;
 
-        // Add or update PUT method
         let methodInput = form.querySelector('input[name="_method"]');
         if (!methodInput) {
             methodInput = document.createElement('input');
