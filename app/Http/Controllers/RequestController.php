@@ -70,7 +70,7 @@ class RequestController extends Controller
         }
 
         $aptiekas = Pharmacy::all();
-        $pieprasijumi = $query->paginate(5)->appends($request->query());
+        $pieprasijumi = $query->paginate(50)->appends($request->query());
 
         if ($request->ajax()) {
             return view('partials.pieprasijumi-table', compact('pieprasijumi'))->render();
