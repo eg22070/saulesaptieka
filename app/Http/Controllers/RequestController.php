@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Requests;
 use App\Models\Pharmacy;  // Assuming such model exists
 use App\Models\Product;
+use App\Models\DeleteHistory;
 use Carbon\Carbon;
 
 class RequestController extends Controller
@@ -172,6 +173,22 @@ class RequestController extends Controller
     public function destroy($id)
     {
         $requestItem = Requests::findOrFail($id);
+        DeleteHistory::create([
+            'request_id'           => $requestItem->id,
+            'datums'               => $requestItem->datums,
+            'aptiekas_id'          => $requestItem->aptiekas_id,
+            'artikula_id'          => $requestItem->artikula_id,
+            'daudzums'             => $requestItem->daudzums,
+            'izrakstitais_daudzums'=> $requestItem->izrakstitais_daudzums,
+            'statuss'              => $requestItem->statuss,
+            'aizliegums'           => $requestItem->aizliegums,
+            'iepircejs'            => $requestItem->iepircejs,
+            'piegades_datums'      => $requestItem->piegades_datums,
+            'piezimes'             => $requestItem->piezimes,
+            'completed'            => $requestItem->completed,
+            'deleted_at'           => Carbon::now(),
+        ]);
+
         $requestItem->delete();
 
         return redirect()->back()->with('success', 'Pieprasījums dzēsts');
