@@ -1,8 +1,31 @@
+{{ $pieprasijumi->links() }}
 <table class="table custom-requests-table">
     <thead>
         <tr>
+            @php
+                $isDateSort = ( ($sort ?? request('sort')) === 'datums' );
+                $currentDir = $direction ?? request('direction', 'asc');
+                $nextDir    = $isDateSort && $currentDir === 'asc' ? 'desc' : 'asc';
+            @endphp
             <th style="width: 3%;  border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
-            <th style="width: 8%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Datums</th>
+            <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                @php
+                    // keep existing filters/search in query when changing sort
+                    $query = request()->except('page', 'sort', 'direction');
+                    $query['sort']      = 'datums';
+                    $query['direction'] = $nextDir;
+                @endphp
+                <a href="{{ route('pieprasijumi.index', $query) }}" style="color: inherit; text-decoration: none;">
+                    Datums
+                    @if($isDateSort)
+                        @if($currentDir === 'asc')
+                            ▲
+                        @else
+                            ▼
+                        @endif
+                    @endif
+                </a>
+            </th>
             <th style="width: 12%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Aptieka</th>
             <th style="width: 5%;  border: 1px solid #080000ff; padding: 4px; text-align: center;">Valsts</th>
             <th style="width: 10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ID numurs</th>

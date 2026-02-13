@@ -13,7 +13,9 @@ class RequestController extends Controller
     public function index(Request $request)
     {
         $query = Requests::with(['aptiekas', 'artikuli']);
-        $status_filter = $request->input('status_filter'); // Add this line
+        $status_filter = $request->has('status_filter')
+        ? $request->input('status_filter')
+        : 'incomplete';
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
             $query->where(function($q) use ($searchTerm) {
@@ -26,36 +28,56 @@ class RequestController extends Controller
                 ->orWhere('iepircejs', 'like', "%{$searchTerm}%");
             });
         }
-        if ($status = $request->input('status_filter')) {
-            if ($status === 'completed') {
-                $query->where('completed', true);
-            } elseif ($status === 'incomplete') {
-                $query->where('completed', false);
-            }
-            // if 'all', then no filter applied
+        if ($status_filter === 'completed') {
+            $query->where('completed', true);
+        } elseif ($status_filter === 'incomplete') {
+            $query->where('completed', false);
         }
         // Pharmacy filter
         if ($pharmacyFilter = $request->input('pharmacy_filter')) {
             if ($pharmacyFilter === 'saule10') {
-                // aptiekas_id = 1314 (Saule-10, SIA Saules aptieka)
+                // Only Saule-10
                 $query->where('aptiekas_id', 1314);
+            } elseif ($pharmacyFilter === 'other') {
+                // All pharmacies except Saule-10
+                $query->where('aptiekas_id', '!=', 1314);
             }
         }
 
         // Buyer (Iepircējs) filter
         if ($buyerFilter = $request->input('buyer_filter')) {
-            $query->where('iepircejs', $buyerFilter);
+            if ($buyerFilter === 'no_buyer') {
+                // Show records where iepircejs is empty / null
+                $query->where(function ($q) {
+                    $q->whereNull('iepircejs')
+                    ->orWhere('iepircejs', '');
+                });
+            } else {
+                $query->where('iepircejs', $buyerFilter);
+            }
         }
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
+
+        $sort      = $request->input('sort', 'datums');      // default sort field
+        $direction = $request->input('direction', 'asc');   // default ascending
+
+        if ($sort === 'datums') {
+            $query->orderBy('datums', $direction);
+        } else {
+            $query->orderBy('datums', 'asc'); // fallback
+        }
+
         $aptiekas = Pharmacy::all();
-        $pieprasijumi = $query->orderBy('datums', 'asc')->paginate(50);
+        $pieprasijumi = $query->paginate(5)->appends($request->query());
 
         if ($request->ajax()) {
             return view('partials.pieprasijumi-table', compact('pieprasijumi'))->render();
         }
 
-        return view('pieprasijumi.index', compact('pieprasijumi', 'aptiekas', 'artikuli', 'status_filter'));
+        return view('pieprasijumi.index', compact('pieprasijumi', 'aptiekas', 'artikuli', 'status_filter'))
+        ->with('sort', $sort)
+        ->with('direction', $direction);
     }
 
     public function create()
@@ -84,7 +106,7 @@ class RequestController extends Controller
 
         Requests::create($validated);
 
-        return redirect()->route('pieprasijumi.index')->with('success', 'Pieprasījums veiksmīgi pievienots');
+        return redirect()->back()->with('success', 'Pieprasījums veiksmīgi pievienots');
     }
 
     public function show($id)
@@ -144,7 +166,7 @@ class RequestController extends Controller
         
         
         
-        return redirect()->route('pieprasijumi.index')->with('success', 'Pieprasījums veiksmīgi atjaunināts');
+        return redirect()->back()->with('success', 'Pieprasījums veiksmīgi atjaunināts');
     }
 
     public function destroy($id)
@@ -152,6 +174,6 @@ class RequestController extends Controller
         $requestItem = Requests::findOrFail($id);
         $requestItem->delete();
 
-        return redirect()->route('pieprasijumi.index')->with('success', 'Pieprasījums dzēsts');
+        return redirect()->back()->with('success', 'Pieprasījums dzēsts');
     }
 }

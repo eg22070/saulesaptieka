@@ -27,18 +27,22 @@
                     <button class="btn btn-outline-secondary" type="submit">Meklēt</button>
                 </div>
             </div>
+            <input type="hidden" name="status_filter" value="{{ request()->has('status_filter') ? request('status_filter') : ($status_filter ?? '') }}">
+            <input type="hidden" name="pharmacy_filter" value="{{ request('pharmacy_filter') }}">
+            <input type="hidden" name="buyer_filter"    value="{{ request('buyer_filter') }}">
         </form>
         <!-- Filter by completion status -->
 
     <div class="mb-3">
         <form method="GET" action="{{ route('pieprasijumi.index') }}" id="filtersForm">
+            <input type="hidden" name="search" id="filters_search" value="{{ request('search') }}">
             {{-- Status filter --}}
             <div class="form-check form-check-inline">
                 <label class="form-label me-2 mr-3" for="status_filter">Statuss:</label>
                 <select name="status_filter" id="status_filter" class="form-select form-select-sm">
-                    <option value="" {{ request('status_filter') == '' ? 'selected' : '' }}>Visi</option>
-                    <option value="completed"  {{ request('status_filter') == 'completed'  ? 'selected' : '' }}>Pabeigtie</option>
-                    <option value="incomplete" {{ request('status_filter') == 'incomplete' ? 'selected' : '' }}>Nepabeigtie</option>
+                    <option value=""          {{ $status_filter === ''           ? 'selected' : '' }}>Visi</option>
+                    <option value="completed" {{ $status_filter === 'completed'  ? 'selected' : '' }}>Pabeigtie</option>
+                    <option value="incomplete"{{ $status_filter === 'incomplete' ? 'selected' : '' }}>Neizpildītie</option>
                 </select>
             </div>
 
@@ -50,6 +54,9 @@
                     <option value="saule10" {{ request('pharmacy_filter') == 'saule10' ? 'selected' : '' }}>
                         Saule-10 (SIA Saules aptieka)
                     </option>
+                    <option value="other" {{ request('pharmacy_filter') == 'other' ? 'selected' : '' }}>
+                        Pārējās aptiekas
+                    </option>
                 </select>
             </div>
 
@@ -57,14 +64,19 @@
             <div class="form-check form-check-inline ms-4">
                 <label class="form-label me-2 mr-3" for="buyer_filter">Iepircējs:</label>
                 <select name="buyer_filter" id="buyer_filter" class="form-select form-select-sm">
-                    <option value="" {{ request('buyer_filter') == '' ? 'selected' : '' }}>Visi iepircēji</option>
-                    <option value="Artūrs" {{ request('buyer_filter') == 'Artūrs' ? 'selected' : '' }}>Artūrs</option>
-                    <option value="Liene"  {{ request('buyer_filter') == 'Liene'  ? 'selected' : '' }}>Liene</option>
-                    <option value="Anna"   {{ request('buyer_filter') == 'Anna'   ? 'selected' : '' }}>Anna</option>
-                    <option value="Iveta"  {{ request('buyer_filter') == 'Iveta'  ? 'selected' : '' }}>Iveta</option>
+                    <option value=""        {{ request('buyer_filter') == ''         ? 'selected' : '' }}>Visi iepircēji</option>
+                    <option value="no_buyer"{{ request('buyer_filter') == 'no_buyer' ? 'selected' : '' }}>Nav iepircēja</option>
+                    <option value="Artūrs"  {{ request('buyer_filter') == 'Artūrs'   ? 'selected' : '' }}>Artūrs</option>
+                    <option value="Liene"   {{ request('buyer_filter') == 'Liene'    ? 'selected' : '' }}>Liene</option>
+                    <option value="Anna"    {{ request('buyer_filter') == 'Anna'     ? 'selected' : '' }}>Anna</option>
+                    <option value="Iveta"   {{ request('buyer_filter') == 'Iveta'    ? 'selected' : '' }}>Iveta</option>
                 </select>
             </div>
         </form>
+        {{-- Reset filters button --}}
+        <a href="{{ route('pieprasijumi.index') }}" class="btn btn-sm btn-outline-secondary mt-3">
+            Atiestatīt filtrus
+        </a>
     </div>
     </div>
         <!-- Add Button -->
@@ -217,6 +229,8 @@
 
     const searchInput = document.getElementById('searchInput');
     const searchForm = document.getElementById('searchForm');
+    const filtersForm      = document.getElementById('filtersForm');
+    const filtersSearch    = document.getElementById('filters_search');
     const resultsContainer = document.getElementById('searchResults');
 
     let debounceTimer;
@@ -236,8 +250,19 @@
     });
 
     function fetchResults(searchTerm) {
-        const url = `${searchForm.action}?search=${encodeURIComponent(searchTerm)}`;
-        
+        const statusFilter   = document.getElementById('status_filter').value;
+        const pharmacyFilter = document.getElementById('pharmacy_filter').value;
+        const buyerFilter    = document.getElementById('buyer_filter').value;
+
+        const params = new URLSearchParams({
+            search: searchTerm,
+            status_filter: statusFilter,
+            pharmacy_filter: pharmacyFilter,
+            buyer_filter: buyerFilter,
+        });
+
+        const url = `${searchForm.action}?${params.toString()}`;
+
         fetch(url, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -398,17 +423,25 @@
     // ---------------------------------------------------------
     // FILTER RADIO BUTTONS
     // ---------------------------------------------------------
-    const filtersForm = document.getElementById('filtersForm');
+    const sfStatus   = searchForm.querySelector('input[name="status_filter"]');
+    const sfPharmacy = searchForm.querySelector('input[name="pharmacy_filter"]');
+    const sfBuyer    = searchForm.querySelector('input[name="buyer_filter"]');
 
     document.getElementById('status_filter').addEventListener('change', function () {
+        filtersSearch.value = searchInput.value;
+        sfStatus.value = this.value;
         filtersForm.submit();
     });
 
     document.getElementById('pharmacy_filter').addEventListener('change', function () {
+        filtersSearch.value = searchInput.value;
+        sfPharmacy.value = this.value;
         filtersForm.submit();
     });
 
     document.getElementById('buyer_filter').addEventListener('change', function () {
+        filtersSearch.value = searchInput.value;
+        sfBuyer.value = this.value;
         filtersForm.submit();
     });
   });
