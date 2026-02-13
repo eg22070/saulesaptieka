@@ -49,6 +49,7 @@
       <form id="pharmacyForm" method="POST" action="">
         @csrf
         @method('POST') <!-- This will be changed dynamically for edit -->
+        <input type="hidden" name="search" id="search_hidden" value="{{ request('search') }}">
 
         <div class="modal-header">
           <h5 class="modal-title" id="pharmacyModalLabel">Pievienot/labot aptieku</h5>
@@ -82,6 +83,7 @@
     var saveBtn = document.getElementById('modalSaveBtn');
 
     const searchInput      = document.getElementById('pharmacySearchInput');
+    const searchHidden = document.getElementById('search_hidden');
     const searchForm       = document.getElementById('pharmacySearchForm');
     const resultsContainer = document.getElementById('pharmaciesResults');
 
@@ -97,22 +99,21 @@
         });
 
         function fetchResults(searchTerm) {
-            const url = `${searchForm.action}?search=${encodeURIComponent(searchTerm)}`;
+          const params = new URLSearchParams({ search: searchTerm });
+          const url = `${searchForm.action}?${params.toString()}`;
 
-            fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                resultsContainer.innerHTML = html;
-                // no manual re-bind needed because we use delegation for .edit-btn
-            })
-            .catch(error => {
-                console.error('Error fetching pharmacies:', error);
-            });
-        }
+          // update URL so pagination/redirects know about it
+          window.history.replaceState({}, '', url);
+
+          fetch(url, {
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          })
+          .then(response => response.text())
+          .then(html => {
+              resultsContainer.innerHTML = html;
+          })
+          .catch(error => console.error('Error fetching pharmacies:', error));
+      }
     }
     // Handle "Add Pharmacy" button click
     document.getElementById('addPharmacyBtn').addEventListener('click', function () {
@@ -130,38 +131,40 @@
       modal.querySelector('.modal-title').textContent = 'Add Pharmacy';
       saveBtn.textContent = 'Add';
 
-      // If your form has any other setup, do here
+      if (searchHidden && searchInput) {
+          searchHidden.value = searchInput.value;
+      }
     });
 
     // Handle "Edit" buttons
-    document.querySelectorAll('.edit-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = this.getAttribute('data-id');
-        var nosaukums = this.getAttribute('data-nosk');
-        var adrese = this.getAttribute('data-adrese');
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.edit-btn');
+      if (!btn) return;
 
-        // Set form action to the update route
-        form.action = "/pharmacies/" + id; 
+      const id        = btn.getAttribute('data-id');
+      const nosaukums = btn.getAttribute('data-nosk');
+      const adrese    = btn.getAttribute('data-adrese');
 
-        // Ensure method input exists and set to PUT
-        if (!form.querySelector('input[name="_method"]')) {
-          var methodInput = document.createElement('input');
+      // Set form action to the update route
+      form.action = "/pharmacies/" + id;
+
+      // Ensure method input exists and set to PUT
+      let methodInput = form.querySelector('input[name="_method"]');
+      if (!methodInput) {
+          methodInput = document.createElement('input');
           methodInput.type = 'hidden';
           methodInput.name = '_method';
-          methodInput.value = 'PUT';
           form.appendChild(methodInput);
-        } else {
-          form.querySelector('input[name="_method"]').value = 'PUT';
-        }
+      }
+      methodInput.value = 'PUT';
 
-        // Fill form fields with current data
-        form.querySelector('#nosaukums').value = nosaukums;
-        form.querySelector('#adrese').value = adrese;
+      // Fill form fields with current data
+      form.querySelector('#nosaukums').value = nosaukums;
+      form.querySelector('#adrese').value = adrese;
 
-        // Update modal title and button text for editing
-        modal.querySelector('.modal-title').textContent = 'Edit Pharmacy';
-        saveBtn.textContent = 'Update';
-      });
-    });
+      // Update modal title and button text for editing
+      modal.querySelector('.modal-title').textContent = 'Edit Pharmacy';
+      saveBtn.textContent = 'Update';
+  });
   });
 </script>

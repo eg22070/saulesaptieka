@@ -21,7 +21,7 @@ class PharmacyController extends Controller
         }
 
         // Sort by name in alphabetical order
-        $pharmacies = $query->orderBy('nosaukums')->paginate(50);
+        $pharmacies = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
 
         if ($request->ajax()) {
             return view('partials.pharmacies-table', compact('pharmacies'))->render();
@@ -43,7 +43,7 @@ class PharmacyController extends Controller
 
         Pharmacy::create($validatedData);
 
-        return redirect()->route('pharmacies.index')->with('success', 'Aptieka pievienota!');
+        return redirect()->back()->with('success', 'Aptieka pievienota!');
     }
 
     public function show(Pharmacy $pharmacy)
@@ -65,13 +65,13 @@ class PharmacyController extends Controller
 
         $pharmacy->update($validatedData);
 
-        return redirect()->route('pharmacies.index')->with('success', 'Aptieka atjaunota!');
+        return redirect()->back()->with('success', 'Aptieka atjaunota!');
     }
 
     public function destroy(Pharmacy $pharmacy)
     {
         $pharmacy->delete();
 
-        return redirect()->route('pharmacies.index')->with('success', 'Aptieka izdzēsta!');
+        return redirect()->back()->with('success', 'Aptieka izdzēsta!');
     }
 }
