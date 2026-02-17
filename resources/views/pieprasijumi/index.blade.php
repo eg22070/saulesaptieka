@@ -164,6 +164,10 @@
                     <option value="Stacionārs">Stacionārs</option>
                 </select>
             </div>
+            <div class="mb-2 d-flex align-items-center">
+                <label for="cito" class="form-label mr-3" style="white-space: nowrap;">CITO</label>
+                <input type="checkbox" id="cito" name="cito" value="1">
+            </div>
             <div id="additionalFields" style="display:none;">
             <div class="mb-2 d-flex align-items-center">
                 <label for="izrakstitais_daudzums" class="form-label mr-3" style="white-space: nowrap;">Izrakstītais daudzums</label>
@@ -385,6 +389,7 @@
         document.getElementById('iepircejs').value             = data.iepircejs;
         document.getElementById('piegades_datums').value       = data.piegades_datums;
         document.getElementById('piezimes').value              = data.piezimes;
+        document.getElementById('cito').checked = (data.cito === '1');
 
         // Handle Completed/Uncompleted Checkboxes
         if (data.completed === '1') {

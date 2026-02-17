@@ -63,6 +63,8 @@ class RequestController extends Controller
         $sort      = $request->input('sort', 'datums');      // default sort field
         $direction = $request->input('direction', 'asc');   // default ascending
 
+        $query->orderBy('cito', 'desc');
+
         if ($sort === 'datums') {
             $query->orderBy('datums', $direction);
         } else {
@@ -102,6 +104,7 @@ class RequestController extends Controller
             'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta',
             'piegades_datums' => 'nullable|string',
             'piezimes' => 'nullable|string',
+            'cito' => 'nullable|boolean',
         ]);
         $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
@@ -142,15 +145,17 @@ class RequestController extends Controller
             'piezimes' => 'nullable|string',
             // Add 'completed' to validation, it's boolean, not part of date issue
             'completed' => 'nullable|boolean', 
+            'cito' => 'nullable|boolean',
         ]);
 
         // --- NEW CONVERSION STEP ---
         // Convert the 'datums' string from 'd/m/Y' to a Carbon object
         $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
-
+        $validated['cito'] = $request->has('cito');
         $requestItem->update($validated);
         // Logic for completion (keep this as is)
         $isCompleted = $request->has('completed') && $request->completed == '1';
+        
         
         if ($request->has('completed')) {
             if ($request->completed == '1') {

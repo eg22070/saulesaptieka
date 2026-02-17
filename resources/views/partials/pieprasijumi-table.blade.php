@@ -41,7 +41,7 @@
     <tbody>
         @forelse ($pieprasijumi as $art)
             <!-- Main Row -->
-            <tr class="request-row"
+            <tr class="request-row {{ $art->cito ? 'request-row-cito' : '' }}"
                 style="background-color: {{ $loop->odd ? '#ffffff' : '#f0f0f0' }};">
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center; vertical-align: middle;">
                     @if($art->completed)
@@ -96,6 +96,7 @@
                                     data-piegades_datums="{{ $art->piegades_datums }}"
                                     data-piezimes="{{ $art->piezimes }}"
                                     data-completed="{{ $art->completed ? '1' : '0' }}"
+                                    data-cito="{{ $art->cito ? '1' : '0' }}"
                                     data-edit-mode="true">
                                     Labot</button>
 
@@ -154,7 +155,10 @@
     font-weight: 600;
     border: 1px solid transparent;
     white-space: nowrap;
-}
+    }
+    .request-row-cito {
+    background-color: #fff8b3 !important; /* light yellow */
+    }
 
 /* Default styles 
 .badge-status   { background-color: #e0f5e5; color: #1b5e20; border-color: #1b5e20; }
