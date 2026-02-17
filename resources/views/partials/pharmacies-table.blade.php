@@ -13,7 +13,6 @@
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center; vertical-align: middle;">{{ $pharmacy->nosaukums }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center; vertical-align: middle;">{{ $pharmacy->adrese }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
-                            <div class="d-flex gap-2"> <!-- Using flexbox with a small gap -->
                               <button class="btn btn-sm btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#pharmacyModal"
                               data-id="{{ $pharmacy->id }}"
                               data-nosk="{{ $pharmacy->nosaukums }}"
@@ -24,7 +23,6 @@
                                   @method('DELETE')
                                   <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Vai tiešām vēlaties izdzēst šo aptieku?')">Dzēst</button>
                               </form>
-                          </div>
                         </td>
                     </tr>
                 @empty

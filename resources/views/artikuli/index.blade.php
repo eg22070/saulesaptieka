@@ -81,7 +81,7 @@
             </div>
             <div class="mb-3">
                 <label for="snn" class="form-label">SNN</label>
-                <input type="text" class="form-control" id="snn" name="snn">
+                <textarea class="form-control" id="snn" name="snn" rows="2"></textarea>
             </div>
             <div class="mb-3">
                 <label for="analogs" class="form-label">Analogs</label>
