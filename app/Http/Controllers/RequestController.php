@@ -57,6 +57,17 @@ class RequestController extends Controller
                 $query->where('iepircejs', $buyerFilter);
             }
         }
+        // date range filter
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            try {
+                $from = Carbon::createFromFormat('d/m/Y', $request->input('date_from'))->startOfDay();
+                $to   = Carbon::createFromFormat('d/m/Y', $request->input('date_to'))->endOfDay();
+
+                $query->whereBetween('datums', [$from->format('Y-m-d'), $to->format('Y-m-d')]);
+            } catch (\Exception $e) {
+                // ignore invalid date input or handle as you like
+            }
+        }
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
 

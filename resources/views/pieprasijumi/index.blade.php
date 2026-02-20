@@ -30,6 +30,8 @@
             <input type="hidden" name="status_filter" value="{{ request()->has('status_filter') ? request('status_filter') : ($status_filter ?? '') }}">
             <input type="hidden" name="pharmacy_filter" value="{{ request('pharmacy_filter') }}">
             <input type="hidden" name="buyer_filter"    value="{{ request('buyer_filter') }}">
+            <input type="hidden" name="date_from" id="date_from_search" value="{{ request('date_from') }}">
+            <input type="hidden" name="date_to"   id="date_to_search"   value="{{ request('date_to') }}">
         </form>
         <!-- Filter by completion status -->
 
@@ -72,6 +74,20 @@
                     <option value="Iveta"   {{ request('buyer_filter') == 'Iveta'    ? 'selected' : '' }}>Iveta</option>
                 </select>
             </div>
+
+             {{-- Date range filter --}}
+            <div class="form-check form-check-inline ms-4">
+                <label class="form-label me-2 mr-3" for="date_range">Datums:</label>
+                <input type="text"
+                id="date_range"
+                class="form-control form-control-sm"
+                style="min-width: 250px;"
+                placeholder="Izvēlieties datumus"
+                value="{{ request('date_from') && request('date_to') ? request('date_from').' - '.request('date_to') : '' }}">
+            </div>
+
+            <input type="hidden" name="date_from" id="date_from_filter" value="{{ request('date_from') }}">
+            <input type="hidden" name="date_to"   id="date_to_filter"   value="{{ request('date_to') }}">
         </form>
         {{-- Reset filters button --}}
         <a href="{{ route('pieprasijumi.index') }}" class="btn btn-sm btn-outline-secondary mt-3">
@@ -244,7 +260,49 @@
     const artikulaNameInput = document.getElementById('artikula_name');
     const artikulaIdInput = document.getElementById('artikula_id');
     const additionalFields = document.getElementById('additionalFields');
+
+    const dateRangeInput = document.getElementById('date_range');
+    const dateFromInput  = document.getElementById('date_from_filter');  // filtersForm hidden
+    const dateToInput    = document.getElementById('date_to_filter');    // filtersForm hidden
+    const sfDateFrom     = document.getElementById('date_from_search');  // searchForm hidden
+    const sfDateTo       = document.getElementById('date_to_search');    // searchForm hidden
     
+    // Date range picker
+    if (dateRangeInput) {
+        // Build default range from current request
+        let defaultDates = null;
+        if (dateFromInput && dateToInput && dateFromInput.value && dateToInput.value) {
+            defaultDates = [dateFromInput.value, dateToInput.value]; // ["01/02/2026", "20/02/2026"]
+        }
+
+        flatpickr(dateRangeInput, {
+            mode: "range",
+            dateFormat: "d/m/Y",
+            locale: "lv",
+            defaultDate: defaultDates,
+            onChange: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    const [from, to] = selectedDates;
+                    const pad = n => String(n).padStart(2, '0');
+
+                    const fromStr = pad(from.getDate()) + '/' + pad(from.getMonth() + 1) + '/' + from.getFullYear();
+                    const toStr   = pad(to.getDate())   + '/' + pad(to.getMonth() + 1)   + '/' + to.getFullYear();
+
+                    // update hidden fields
+                    dateFromInput.value = fromStr;
+                    dateToInput.value   = toStr;
+
+                    if (sfDateFrom) sfDateFrom.value = fromStr;
+                    if (sfDateTo)   sfDateTo.value   = toStr;
+
+                    filtersSearch.value = searchInput.value;
+
+                    filtersForm.submit();
+                }
+            }
+        });
+    }
+
     searchInput.addEventListener('input', function() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function() {
@@ -257,12 +315,16 @@
         const statusFilter   = document.getElementById('status_filter').value;
         const pharmacyFilter = document.getElementById('pharmacy_filter').value;
         const buyerFilter    = document.getElementById('buyer_filter').value;
+        const dateFrom       = dateFromInput ? dateFromInput.value : '';
+        const dateTo         = dateToInput   ? dateToInput.value   : '';
 
         const params = new URLSearchParams({
             search: searchTerm,
             status_filter: statusFilter,
             pharmacy_filter: pharmacyFilter,
             buyer_filter: buyerFilter,
+            date_from: dateFrom,
+            date_to: dateTo,
         });
 
         const url = `${searchForm.action}?${params.toString()}`;
