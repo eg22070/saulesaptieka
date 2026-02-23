@@ -329,6 +329,9 @@
 
         const url = `${searchForm.action}?${params.toString()}`;
 
+        // IMPORTANT: keep browser URL in sync with live search
+        window.history.replaceState({}, '', url);
+        
         fetch(url, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
