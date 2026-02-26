@@ -193,42 +193,42 @@
                 <input type="checkbox" id="cito" name="cito" value="1">
             </div>
             <div id="additionalFields" style="display:none;">
-            <div class="mb-2 d-flex align-items-center">
-                <label for="izrakstitais_daudzums" class="form-label mr-3" style="white-space: nowrap;">Izrakstītais daudzums</label>
-                <input type="number" class="form-control" id="izrakstitais_daudzums" name="izrakstitais_daudzums" style="width: 100px;">
-            </div>
+                <div class="mb-2 d-flex align-items-center">
+                    <label for="izrakstitais_daudzums" class="form-label mr-3" style="white-space: nowrap;">Izrakstītais daudzums</label>
+                    <input type="number" class="form-control" id="izrakstitais_daudzums" name="izrakstitais_daudzums" style="width: 100px;">
+                </div>
 
-            <div class="mb-2 d-flex align-items-center">
-                <label for="statuss" class="form-label mr-3">Statuss</label>
-                <select class="form-control" id="statuss" name="statuss" style="width: 200px;">
-                    <option value>Izvēlieties statusu</option>
-                    <option value="Pasūtīts">Pasūtīts</option>
-                    <option value="Atcelts">Atcelts</option>
-                    <option value="Mainīta piegāde">Mainīta piegāde</option>
-                    <option value="Ir noliktavā">Ir noliktavā</option>
-                    <option value="Daļēji atlikumā">Daļēji atlikumā</option>
-                </select>
-            </div>
-            
-            <div class="mb-2 d-flex align-items-center">
-                <label for="iepircejs" class="form-label mr-3">Iepircējs</label>
-                <select class="form-control" id="iepircejs" name="iepircejs" style="width: 200px;">
-                    <option value>Izvēlieties iepircēju</option>
-                    <option value="Artūrs">Artūrs</option>
-                    <option value="Liene">Liene</option>
-                    <option value="Anna">Anna</option>
-                    <option value="Iveta">Iveta</option>
-                </select>
-            </div>
-            <div class="mb-2 d-flex align-items-center">
-                <label for="piegades_datums" class="form-label mr-3" style="white-space: nowrap;">Piegādes datums</label>
-                <textarea class="form-control" id="piegades_datums" name="piegades_datums" rows="1"></textarea>
+                <div class="mb-2 d-flex align-items-center">
+                    <label for="statuss" class="form-label mr-3">Statuss</label>
+                    <select class="form-control" id="statuss" name="statuss" style="width: 200px;">
+                        <option value>Izvēlieties statusu</option>
+                        <option value="Pasūtīts">Pasūtīts</option>
+                        <option value="Atcelts">Atcelts</option>
+                        <option value="Mainīta piegāde">Mainīta piegāde</option>
+                        <option value="Ir noliktavā">Ir noliktavā</option>
+                        <option value="Daļēji atlikumā">Daļēji atlikumā</option>
+                    </select>
+                </div>
+                
+                <div class="mb-2 d-flex align-items-center">
+                    <label for="iepircejs" class="form-label mr-3">Iepircējs</label>
+                    <select class="form-control" id="iepircejs" name="iepircejs" style="width: 200px;">
+                        <option value>Izvēlieties iepircēju</option>
+                        <option value="Artūrs">Artūrs</option>
+                        <option value="Liene">Liene</option>
+                        <option value="Anna">Anna</option>
+                        <option value="Iveta">Iveta</option>
+                    </select>
+                </div>
+                <div class="mb-2 d-flex align-items-center">
+                    <label for="piegades_datums" class="form-label mr-3" style="white-space: nowrap;">Piegādes datums</label>
+                    <textarea class="form-control" id="piegades_datums" name="piegades_datums" rows="1"></textarea>
+                </div>
             </div>
             <div class="mb-1 d-flex align-items-center">
                 <label for="piezimes" class="form-label mr-3">Piezīmes</label>
                 <textarea class="form-control" id="piezimes" name="piezimes" rows="1"></textarea>
             </div>
-        </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Atcelt</button>
             <button type="submit" class="btn btn-primary" id="requestModalSaveBtn">Saglabāt</button>
