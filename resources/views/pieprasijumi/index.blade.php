@@ -127,6 +127,11 @@
         </div>
         </div>
 
+        @php
+            $isBrivibas = auth()->check() && auth()->user()->role === 'brivibas';
+            $defaultAptieka = $aptiekas->firstWhere('id', 1314);
+        @endphp
+
         <div class="modal-body">
             <div class="mb-2">
                 <label for="datums" class="form-label mr-3">Datums</label>
@@ -134,15 +139,18 @@
             </div>
             <div class="mb-2 d-flex align-items-center">
                 <label for="aptiekas_name" class="form-label mr-3">Aptieka</label>
-                <!-- Input for user's visible selection -->
+
                 <input type="text" 
                     class="form-control" 
                     placeholder="Rakstiet aptiekas nosaukumu" 
                     required 
                     list="aptieki" 
-                    id="aptiekas_name" />
-                <!-- Hidden ID for form submission -->
-                <input type="hidden" id="aptiekas_id" name="aptiekas_id">
+                    id="aptiekas_name"
+                    value="{{ $isBrivibas && $defaultAptieka ? $defaultAptieka->nosaukums : '' }}" />
+
+                <input type="hidden" id="aptiekas_id" name="aptiekas_id"
+                    value="{{ $isBrivibas && $defaultAptieka ? $defaultAptieka->id : '' }}">
+
                 <datalist id="aptieki">
                     @foreach($aptiekas as $aptieka)
                         <option value="{{ $aptieka->nosaukums }}" data-id="{{ $aptieka->id }}"></option>
@@ -490,6 +498,7 @@
                     : 'none';
         }
     });
+
     // ---------------------------------------------------------
     // FILTER RADIO BUTTONS
     // ---------------------------------------------------------
@@ -534,4 +543,38 @@
             form.appendChild(completedInput);
             form.submit();
     });
+    function copyProductName(button) {
+        const name = button.getAttribute('data-name');
+        if (!name) return;
+
+        const textSpan = button.querySelector('.copy-text');
+
+        const showCopied = () => {
+            if (!textSpan) return;
+            textSpan.textContent = 'Nokopēts';
+            setTimeout(() => {
+                textSpan.textContent = 'Kopēt';
+            }, 1200); // 1.2s later revert
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(name)
+                .then(showCopied)
+                .catch(err => console.error('Clipboard API failed', err));
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = name;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showCopied();
+            } catch (e) {
+                console.error('execCommand copy failed', e);
+            }
+            document.body.removeChild(textarea);
+        }
+    }
+
+
 </script>

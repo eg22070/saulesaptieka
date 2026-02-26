@@ -56,6 +56,15 @@
                     style="border: 1px solid #080000ff; padding: 4px; cursor: pointer;"
                     title="Klikšķiniet, lai redzētu detaļas">
                     <b>{{ $art->artikuli->nosaukums }}</b>
+                    <button type="button"
+                            class="copy-btn"
+                            data-name="{{ $art->artikuli->nosaukums }}"
+                            onclick="copyProductName(this); event.stopPropagation();">
+                        <img src="{{ asset('images/copy.png') }}"
+                            alt="Kopēt"
+                            class="copy-icon">
+                        <span class="copy-text">Kopēt</span>
+                    </button>
                 </td>
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->daudzums }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->izrakstitais_daudzums }}</td>
@@ -158,6 +167,36 @@
     }
     .request-row-cito {
     background-color: #fff8b3 !important; /* light yellow */
+    }
+    .copy-btn {
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin-left: 6px;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    /* remove focus/active outlines and borders */
+    .copy-btn:focus,
+    .copy-btn:active,
+    .copy-btn:focus-visible {
+        outline: none;
+        box-shadow: none;
+        border: none;
+    }
+
+    .copy-btn:hover {
+        color: #000;
+    }
+
+    .copy-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
     }
 
 /* Default styles 
