@@ -9,11 +9,12 @@ class Requests extends Model
     protected $table = 'pieprasijumi';
     protected $fillable = [
         'datums', 'aptiekas_id', 'artikula_id', 'daudzums', 'izrakstitais_daudzums',
-        'pazinojuma_datums', 'statuss', 'aizliegums', 'iepircejs', 'piegades_datums', 'piezimes', 'completed', 'completed_at', 'who_completed', 'cito', 
+        'pazinojuma_datums', 'statuss', 'aizliegums', 'iepircejs', 'piegades_datums', 'piezimes', 'completed', 'completed_at', 'who_completed', 'cito', 'previous_artikuli_ids',
     ];
     protected $casts = [
         'datums' => 'date',
         'completed' => 'boolean',
+        'previous_artikuli_ids' => 'array',
         'completed_at' => 'datetime', // This is crucial
     ];
     public function aptiekas()

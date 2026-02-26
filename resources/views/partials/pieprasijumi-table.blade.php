@@ -6,6 +6,7 @@
                 $isDateSort = ( ($sort ?? request('sort')) === 'datums' );
                 $currentDir = $direction ?? request('direction', 'asc');
                 $nextDir    = $isDateSort && $currentDir === 'asc' ? 'desc' : 'asc';
+                $artikuliMap = $artikuli->keyBy('id');
             @endphp
             <th style="width: 3%;  border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
             <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">
@@ -122,8 +123,23 @@
                     <tr class="additional-info" style="display:none;">
                         <td colspan="12" style="background-color: #f8f9fa; border: 1px solid #080000ff;">
                             <div style="padding: 10px;">
+                                @php
+                                    $previousNames = [];
+                                    if (is_array($art->previous_artikuli_ids)) {
+                                        foreach ($art->previous_artikuli_ids as $prevId) {
+                                            if (isset($artikuliMap[$prevId])) {
+                                                $previousNames[] = $artikuliMap[$prevId]->nosaukums;
+                                            }
+                                        }
+                                    }
+                                @endphp
+                                @if(!empty($previousNames))
+                                    <strong>Bijušie artikuli:</strong>
+                                    {{ implode(' -----> ', $previousNames) }} <br>
+                                @endif
                                 <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
                                 <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
+                                
                                 <strong>Izpildīja:</strong>
 
                                 @if($art->completer)

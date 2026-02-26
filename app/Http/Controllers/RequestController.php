@@ -163,10 +163,10 @@ class RequestController extends Controller
         // Convert the 'datums' string from 'd/m/Y' to a Carbon object
         $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
         $validated['cito'] = $request->has('cito');
-        $requestItem->update($validated);
         // Logic for completion (keep this as is)
         $isCompleted = $request->has('completed') && $request->completed == '1';
-        
+        $oldArtikulaId = $requestItem->artikula_id;
+        $newArtikulaId = $validated['artikula_id'];
         
         if ($request->has('completed')) {
             if ($request->completed == '1') {
@@ -178,11 +178,19 @@ class RequestController extends Controller
                 $requestItem->completed_at   = null;
                 $requestItem->who_completed  = null;
             }
-            $requestItem->save();
         }
         
-        
-        
+        if ($oldArtikulaId != $newArtikulaId) {
+            $history = $requestItem->previous_artikuli_ids ?? [];
+
+            if (!in_array($oldArtikulaId, $history)) {
+                $history[] = $oldArtikulaId;
+            }
+
+            $requestItem->previous_artikuli_ids = $history;
+        }
+        $requestItem->fill($validated);
+        $requestItem->save();
         return redirect()->back()->with('success', 'Pieprasījums veiksmīgi atjaunināts');
     }
 
