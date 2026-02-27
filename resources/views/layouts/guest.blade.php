@@ -18,9 +18,10 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div class="shrink-0 flex items-center">
                     <a href="/">
-                        <img src="{{ asset('images/Saules aptiekas logo.png') }}"
+                        <img src="{{ asset('images/Saules aptiekas logo.jpeg') }}"
                             alt="Saules aptieka"
-                            class="block w-auto h-20">
+                            class="block"
+                            style="height: 400px; width: auto;">
                     </a>
                 </div>
 
