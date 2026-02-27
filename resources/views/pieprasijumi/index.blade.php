@@ -43,7 +43,7 @@
                 <label class="form-label me-2 mr-3" for="status_filter">Statuss:</label>
                 <select name="status_filter" id="status_filter" class="form-select form-select-sm">
                     <option value=""          {{ $status_filter === ''           ? 'selected' : '' }}>Visi</option>
-                    <option value="completed" {{ $status_filter === 'completed'  ? 'selected' : '' }}>Pabeigtie</option>
+                    <option value="completed" {{ $status_filter === 'completed'  ? 'selected' : '' }}>Izpildītie</option>
                     <option value="incomplete"{{ $status_filter === 'incomplete' ? 'selected' : '' }}>Neizpildītie</option>
                 </select>
             </div>
