@@ -86,7 +86,10 @@ class RequestController extends Controller
         $pieprasijumi = $query->paginate(50)->appends($request->query());
 
         if ($request->ajax()) {
-            return view('partials.pieprasijumi-table', compact('pieprasijumi'))->render();
+            return view('partials.pieprasijumi-table', [
+                'pieprasijumi' => $pieprasijumi,
+                'artikuli'     => $artikuli,
+            ])->render();
         }
 
         return view('pieprasijumi.index', compact('pieprasijumi', 'aptiekas', 'artikuli', 'status_filter'))
