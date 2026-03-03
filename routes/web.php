@@ -21,4 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::post('/pieprasijumi/bulk-complete', [RequestController::class, 'bulkComplete'])
+    ->name('pieprasijumi.bulk-complete');
+
 require __DIR__.'/auth.php';

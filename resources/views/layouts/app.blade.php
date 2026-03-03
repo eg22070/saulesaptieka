@@ -39,5 +39,32 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Restore scroll position if we have one
+            const saved = sessionStorage.getItem('requests_scroll');
+            if (saved !== null) {
+                window.scrollTo(0, parseInt(saved, 10));
+                sessionStorage.removeItem('requests_scroll'); // optional: clear after use
+            }
+
+            // Before navigating away (form submit / link click), save position
+            function saveScrollPosition() {
+                sessionStorage.setItem('requests_scroll', window.scrollY.toString());
+            }
+
+            // Capture clicks on delete/edit buttons that cause reload
+            document.addEventListener('click', function (e) {
+                const submitBtn = e.target.closest('button[type="submit"]');
+                const editBtn   = e.target.closest('.edit-request-btn');
+                if (submitBtn || editBtn) {
+                    saveScrollPosition();
+                }
+            });
+
+            // Also save on manual reload / other navigations
+            window.addEventListener('beforeunload', saveScrollPosition);
+        });
+        </script>
     </body>
 </html>

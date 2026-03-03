@@ -72,7 +72,7 @@ class RequestController extends Controller
         // Fetch all aptiekas for dropdowns
 
         $sort      = $request->input('sort', 'created_at');      // default sort field
-        $direction = $request->input('direction', 'asc');   // default ascending
+        $direction = $request->input('direction', 'desc');   // default ascending
 
         $query->orderBy('cito', 'desc');
 
@@ -212,5 +212,23 @@ class RequestController extends Controller
         $requestItem->delete();
 
         return redirect()->back()->with('success', 'Pieprasījums dzēsts');
+    }
+    public function bulkComplete(Request $request)
+    {
+        $ids = $request->input('ids', []); // array of request IDs
+
+        if (!is_array($ids) || empty($ids)) {
+            return redirect()->back()->with('success', 'Nav izvēlēti ieraksti.');
+        }
+
+        Requests::whereIn('id', $ids)
+            ->where('completed', false)
+            ->update([
+                'completed'    => true,
+                'completed_at' => now(),
+                'who_completed'=> auth()->id(),
+            ]);
+
+        return redirect()->back()->with('success', 'Izvēlētie pieprasījumi izpildīti.');
     }
 }
