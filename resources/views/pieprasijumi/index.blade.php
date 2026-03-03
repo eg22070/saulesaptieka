@@ -220,7 +220,7 @@
                 </div>
                 <div class="mb-2 d-flex align-items-center">
                     <label for="piegades_datums" class="form-label mr-3" style="white-space: nowrap;">Piegādes datums</label>
-                    <textarea class="form-control" id="piegades_datums" name="piegades_datums" rows="1"></textarea>
+                    <input type="text" class="form-control" id="piegades_datums" name="piegades_datums" placeholder="DD/MM/YYYY">
                 </div>
             </div>
             <div class="mb-1 d-flex align-items-center">
@@ -381,7 +381,7 @@
         });
     }
     // Initialize Date Picker
-    flatpickr("#datums", {
+    flatpickr("#piegades_datums", {
         dateFormat: "d/m/Y" 
     });
 
