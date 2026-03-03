@@ -19,10 +19,16 @@
             <th style="width: 3%;  border: 1px solid #080000ff; padding: 4px; text-align: center;"> - </th>
             <th style="width: 8%; border: 1px solid #080000ff; padding: 4px; text-align: center;">
                 @php
-                    // keep existing filters/search in query when changing sort
-                    $query = request()->except('page', 'sort', 'direction');
-                    $query['sort']      = 'created_at';
-                    $query['direction'] = $nextDir;
+                    $query = [
+                        'search'          => request('search'),
+                        'status_filter'   => request('status_filter', $status_filter ?? ''),
+                        'pharmacy_filter' => request('pharmacy_filter'),
+                        'buyer_filter'    => request('buyer_filter'),
+                        'date_from'       => request('date_from'),
+                        'date_to'         => request('date_to'),
+                        'sort'            => 'created_at',
+                        'direction'       => $nextDir,
+                    ];
                 @endphp
                 <a href="{{ route('pieprasijumi.index', $query) }}" style="color: inherit; text-decoration: none;">
                     Datums
