@@ -1,4 +1,12 @@
-{{ $pieprasijumi->links() }}
+<form action="{{ route('pieprasijumi.bulkComplete') }}" method="GET" id="bulkCompleteForm">
+
+    <div class="mb-2">
+        <button type="submit" class="btn btn-sm btn-success" id="bulkCompleteBtn" disabled>
+            Izpildīt šos ierakstu/us
+        </button>
+    </div>
+
+    {{ $pieprasijumi->links() }}
 <table class="table custom-requests-table">
     <thead>
         <tr>
@@ -44,8 +52,13 @@
             <!-- Main Row -->
             <tr class="request-row {{ $art->cito ? 'request-row-cito' : '' }}"
                 style="background-color: {{ $loop->odd ? '#ffffff' : '#f0f0f0' }};">
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center; vertical-align: middle;">
-                    @if($art->completed)
+                <td style="border:1px solid #080000ff; padding:4px; text-align:center; vertical-align:middle;">
+                    @if(!$art->completed)
+                        <input type="checkbox"
+                            name="ids[]"
+                            value="{{ $art->id }}"
+                            class="row-checkbox">
+                    @else
                         <span style="font-size: 1.2rem;">✅</span>
                     @endif
                 </td>
@@ -88,7 +101,7 @@
                 </td>
                 <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
                             <!-- Edit Button -->
-                            <button class="btn btn-sm btn-primary edit-request-btn" 
+                            <button type="button" class="btn btn-sm btn-primary edit-request-btn" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#requestModal"
                                     data-id="{{ $art->id }}"
@@ -157,6 +170,7 @@
             </tbody>
 </table>
 {{ $pieprasijumi->links() }}
+</form>
 <style>
     /* Header background */
     .custom-requests-table thead th {

@@ -72,6 +72,7 @@
                     <option value="Liene"   {{ request('buyer_filter') == 'Liene'    ? 'selected' : '' }}>Liene</option>
                     <option value="Anna"    {{ request('buyer_filter') == 'Anna'     ? 'selected' : '' }}>Anna</option>
                     <option value="Iveta"   {{ request('buyer_filter') == 'Iveta'    ? 'selected' : '' }}>Iveta</option>
+                    <option value="Kristaps"   {{ request('buyer_filter') == 'Kristaps'    ? 'selected' : '' }}>Kristaps</option>
                 </select>
             </div>
 
@@ -214,6 +215,7 @@
                         <option value="Liene">Liene</option>
                         <option value="Anna">Anna</option>
                         <option value="Iveta">Iveta</option>
+                        <option value="Kristaps">Kristaps</option>
                     </select>
                 </div>
                 <div class="mb-2 d-flex align-items-center">
@@ -271,6 +273,35 @@
     const sfDateFrom     = document.getElementById('date_from_search');  // searchForm hidden
     const sfDateTo       = document.getElementById('date_to_search');    // searchForm hidden
     
+    /// BULK COMPLETE FUNCTIONALITY
+    const bulkBtn    = document.getElementById('bulkCompleteBtn');
+    const selectAll  = document.getElementById('selectAll');
+
+    function updateBulkBtn() {
+        const anyChecked = document.querySelector('.row-checkbox:checked') !== null;
+        if (bulkBtn) bulkBtn.disabled = !anyChecked;
+    }
+
+    // handle row checkboxes
+    document.addEventListener('change', function (e) {
+        if (e.target.classList && e.target.classList.contains('row-checkbox')) {
+            updateBulkBtn();
+        }
+    });
+
+    // select/deselect all
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            const checked = this.checked;
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = checked;
+            });
+            updateBulkBtn();
+        });
+    }
+
+    updateBulkBtn();
+
     // Date range picker
     if (dateRangeInput) {
         // Build default range from current request

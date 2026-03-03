@@ -14,14 +14,13 @@ Route::redirect('/', '/pieprasijumi')->middleware('auth');
 
 Route::resource('pharmacies', PharmacyController::class);
 Route::resource('artikuli', ProductController::class);
+Route::get('/pieprasijumi/bulk-complete', [RequestController::class, 'bulkComplete'])
+    ->name('pieprasijumi.bulkComplete');
 Route::resource('pieprasijumi', RequestController::class);
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-Route::post('/pieprasijumi/bulk-complete', [RequestController::class, 'bulkComplete'])
-    ->name('pieprasijumi.bulk-complete');
 
 require __DIR__.'/auth.php';

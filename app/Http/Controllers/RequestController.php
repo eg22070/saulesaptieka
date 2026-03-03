@@ -114,7 +114,7 @@ class RequestController extends Controller
             'pazinojuma_datums' => 'nullable|string',
             'statuss' => 'nullable|in:Pasūtīts,Atcelts,Mainīta piegāde,Ir noliktavā,Daļēji atlikumā',
             'aizliegums' => 'nullable|in:Drīkst aizvietot,Nedrīkst aizvietot,NVD,Stacionārs',
-            'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta',
+            'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta,Kristaps',
             'piegades_datums' => 'nullable|string',
             'piezimes' => 'nullable|string',
             'cito' => 'nullable|boolean',
@@ -151,7 +151,7 @@ class RequestController extends Controller
             'pazinojuma_datums' => 'nullable|string', // Add format if it's a date
             'statuss' => 'nullable|in:Pasūtīts,Atcelts,Mainīta piegāde,Ir noliktavā,Daļēji atlikumā',
             'aizliegums' => 'nullable|in:Drīkst aizvietot,Nedrīkst aizvietot,NVD,Stacionārs',
-            'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta',
+            'iepircejs' => 'nullable|in:Artūrs,Liene,Anna,Iveta,Kristaps',
             'piegades_datums' => 'nullable|string', // Add format if it's a date
             'piezimes' => 'nullable|string',
             // Add 'completed' to validation, it's boolean, not part of date issue
@@ -215,7 +215,7 @@ class RequestController extends Controller
     }
     public function bulkComplete(Request $request)
     {
-        $ids = $request->input('ids', []); // array of request IDs
+        $ids = $request->query('ids', []); // or $request->input('ids', []); also works for GET
 
         if (!is_array($ids) || empty($ids)) {
             return redirect()->back()->with('success', 'Nav izvēlēti ieraksti.');
@@ -231,4 +231,5 @@ class RequestController extends Controller
 
         return redirect()->back()->with('success', 'Izvēlētie pieprasījumi izpildīti.');
     }
+
 }
