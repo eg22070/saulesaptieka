@@ -63,7 +63,7 @@ class RequestController extends Controller
                 $from = Carbon::createFromFormat('d/m/Y', $request->input('date_from'))->startOfDay();
                 $to   = Carbon::createFromFormat('d/m/Y', $request->input('date_to'))->endOfDay();
 
-                $query->whereBetween('datums', [$from->format('Y-m-d'), $to->format('Y-m-d')]);
+                $query->whereBetween('created_at', [$from->format('Y-m-d'), $to->format('Y-m-d')]);
             } catch (\Exception $e) {
                 // ignore invalid date input or handle as you like
             }
@@ -71,15 +71,15 @@ class RequestController extends Controller
         $artikuli = Product::all();
         // Fetch all aptiekas for dropdowns
 
-        $sort      = $request->input('sort', 'datums');      // default sort field
+        $sort      = $request->input('sort', 'created_at');      // default sort field
         $direction = $request->input('direction', 'asc');   // default ascending
 
         $query->orderBy('cito', 'desc');
 
-        if ($sort === 'datums') {
-            $query->orderBy('datums', $direction);
+        if ($sort === 'created_at') {
+            $query->orderBy('created_at', $direction);
         } else {
-            $query->orderBy('datums', 'asc'); // fallback
+            $query->orderBy('created_at', 'asc'); // fallback
         }
 
         $aptiekas = Pharmacy::all();
@@ -107,7 +107,6 @@ class RequestController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'datums' => 'required|date_format:d/m/Y',
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -120,7 +119,6 @@ class RequestController extends Controller
             'piezimes' => 'nullable|string',
             'cito' => 'nullable|boolean',
         ]);
-        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
 
         Requests::create($validated);
 
@@ -146,7 +144,6 @@ class RequestController extends Controller
         $requestItem = Requests::findOrFail($id);
         
         $validated = $request->validate([
-            'datums' => 'required|date_format:d/m/Y', // Validation is correct
             'aptiekas_id' => 'required|exists:aptiekas,id',
             'artikula_id' => 'required|exists:artikuli,id',
             'daudzums' => 'required|integer',
@@ -162,9 +159,6 @@ class RequestController extends Controller
             'cito' => 'nullable|boolean',
         ]);
 
-        // --- NEW CONVERSION STEP ---
-        // Convert the 'datums' string from 'd/m/Y' to a Carbon object
-        $validated['datums'] = Carbon::createFromFormat('d/m/Y', $validated['datums'])->format('Y-m-d');
         $validated['cito'] = $request->has('cito');
         // Logic for completion (keep this as is)
         $isCompleted = $request->has('completed') && $request->completed == '1';
@@ -202,7 +196,6 @@ class RequestController extends Controller
         $requestItem = Requests::findOrFail($id);
         DeleteHistory::create([
             'request_id'           => $requestItem->id,
-            'datums'               => $requestItem->datums,
             'aptiekas_id'          => $requestItem->aptiekas_id,
             'artikula_id'          => $requestItem->artikula_id,
             'daudzums'             => $requestItem->daudzums,

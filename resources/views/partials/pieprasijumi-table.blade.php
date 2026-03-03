@@ -3,7 +3,7 @@
     <thead>
         <tr>
             @php
-                $isDateSort = ( ($sort ?? request('sort')) === 'datums' );
+                $isDateSort = ( ($sort ?? request('sort')) === 'created_at' );
                 $currentDir = $direction ?? request('direction', 'asc');
                 $nextDir    = $isDateSort && $currentDir === 'asc' ? 'desc' : 'asc';
                 $artikuliMap = $artikuli->keyBy('id');
@@ -13,7 +13,7 @@
                 @php
                     // keep existing filters/search in query when changing sort
                     $query = request()->except('page', 'sort', 'direction');
-                    $query['sort']      = 'datums';
+                    $query['sort']      = 'created_at';
                     $query['direction'] = $nextDir;
                 @endphp
                 <a href="{{ route('pieprasijumi.index', $query) }}" style="color: inherit; text-decoration: none;">
@@ -49,7 +49,7 @@
                         <span style="font-size: 1.2rem;">✅</span>
                     @endif
                 </td>
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->datums->format('d/m/Y') }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->created_at->format('d/m/Y') }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
@@ -92,7 +92,6 @@
                                     data-bs-toggle="modal" 
                                     data-bs-target="#requestModal"
                                     data-id="{{ $art->id }}"
-                                    data-datums="{{ $art->datums }}"
                                     data-aptiekas_id="{{ $art->aptiekas->id }}"
                                     data-aptiekas_nosaukums="{{ $art->aptiekas->nosaukums }}" 
                                     data-artikula_id="{{ $art->artikuli->id }}"
