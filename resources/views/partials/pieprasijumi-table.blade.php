@@ -132,8 +132,11 @@
                             <form action="{{ route('pieprasijumi.destroy', $art->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Vai tiešām vēlaties dzēst šo pieprasījumu?')">Dzēst</button>
-                            </form>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="if(confirm('Vai tiešām vēlaties dzēst šo pieprasījumu?')) document.getElementById('delete-form-{{ $art->id }}').submit();">
+                                    Dzēst
+                                </button>
                         </td>
                     </tr>
                     
@@ -177,6 +180,15 @@
 </table>
 {{ $pieprasijumi->links() }}
 </form>
+@foreach($pieprasijumi as $art)
+    <form id="delete-form-{{ $art->id }}"
+          action="{{ route('pieprasijumi.destroy', $art->id) }}"
+          method="POST"
+          style="display:none;">
+        @csrf
+        @method('DELETE')
+    </form>
+@endforeach
 <style>
     /* Header background */
     .custom-requests-table thead th {
