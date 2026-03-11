@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\PasutijumiController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect the root URL to the login page for guests
@@ -12,6 +13,7 @@ Route::redirect('/', '/login')->middleware('guest');
 // Set the 'pieprasijumi.index' as the landing page for authenticated users
 Route::redirect('/', '/pieprasijumi')->middleware('auth');
 
+Route::resource('pasutijumi', PasutijumiController::class);
 Route::resource('pharmacies', PharmacyController::class);
 Route::resource('artikuli', ProductController::class);
 Route::get('/pieprasijumi/bulk-complete', [RequestController::class, 'bulkComplete'])

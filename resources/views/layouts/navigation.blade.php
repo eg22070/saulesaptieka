@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('pieprasijumi.index')" :active="request()->routeIs('pieprasijumi.*')">
                         {{ __('Pieprasījumi') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('pasutijumi.index')" :active="request()->routeIs('pasutijumi.*')">
+                        {{ __('Pasūtījumi') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('artikuli.index')" :active="request()->routeIs('artikuli.*')">
                         {{ __('Artikuli') }}
                     </x-nav-link>
