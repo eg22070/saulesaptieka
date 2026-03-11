@@ -278,8 +278,10 @@
     const selectAll  = document.getElementById('selectAll');
 
     function updateBulkBtn() {
+        const bulkBtn = document.getElementById('bulkCompleteBtn');
+        if (!bulkBtn) return;
         const anyChecked = document.querySelector('.row-checkbox:checked') !== null;
-        if (bulkBtn) bulkBtn.disabled = !anyChecked;
+        bulkBtn.disabled = !anyChecked;
     }
 
     // handle row checkboxes
@@ -290,15 +292,15 @@
     });
 
     // select/deselect all
-    if (selectAll) {
-        selectAll.addEventListener('change', function () {
-            const checked = this.checked;
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'selectAll') {
+            const checked = e.target.checked;
             document.querySelectorAll('.row-checkbox').forEach(cb => {
                 cb.checked = checked;
             });
             updateBulkBtn();
-        });
-    }
+        }
+    });
 
     updateBulkBtn();
 
@@ -375,6 +377,7 @@
         .then(response => response.text())
         .then(html => {
             resultsContainer.innerHTML = html;
+            updateBulkBtn();
         })
         .catch(error => {
             console.error('Error:', error);
