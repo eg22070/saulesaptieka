@@ -49,13 +49,13 @@
                     </a>
                 </div>
             </form>
-
+            @if(auth()->check() && strtolower(auth()->user()->role) !== 'farmaceiti')
             <div class="d-flex justify-content-between mb-3">
                 <div>
                     <button class="btn btn-primary" id="openCreateModal">Pievienot Pasūtījumu</button>
                 </div>
             </div>
-
+            @endif
             <div id="searchResults">
                 @include('partials.pasutijumi-table', ['pasutijumi' => $pasutijumi, 'artikuli' => $artikuli])
             </div>

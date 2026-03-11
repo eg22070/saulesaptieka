@@ -14,19 +14,33 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    {{-- Add the "Aptiekas" link here --}}
-                    <x-nav-link :href="route('pieprasijumi.index')" :active="request()->routeIs('pieprasijumi.*')">
-                        {{ __('Pieprasījumi') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('pasutijumi.index')" :active="request()->routeIs('pasutijumi.*')">
-                        {{ __('Pasūtījumi') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('artikuli.index')" :active="request()->routeIs('artikuli.*')">
-                        {{ __('Artikuli') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('pharmacies.index')" :active="request()->routeIs('pharmacies.*')">
-                        {{ __('Aptiekas') }}
-                    </x-nav-link>
+                    {{-- Pieprasījumi: brivibas + kruzes --}}
+                    @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
+                        <x-nav-link :href="route('pieprasijumi.index')" :active="request()->routeIs('pieprasijumi.*')">
+                            {{ __('Pieprasījumi') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- Pasūtījumi: brivibas + farmaceiti (and kruzes if you want) --}}
+                    @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'farmaceiti']))
+                        <x-nav-link :href="route('pasutijumi.index')" :active="request()->routeIs('pasutijumi.*')">
+                            {{ __('Pasūtījumi') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- Artikuli: brivibas + kruzes --}}
+                    @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
+                        <x-nav-link :href="route('artikuli.index')" :active="request()->routeIs('artikuli.*')">
+                            {{ __('Artikuli') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- Aptiekas: brivibas + kruzes --}}
+                    @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
+                        <x-nav-link :href="route('pharmacies.index')" :active="request()->routeIs('pharmacies.*')">
+                            {{ __('Aptiekas') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 

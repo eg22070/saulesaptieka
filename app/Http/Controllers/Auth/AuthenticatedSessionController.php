@@ -25,10 +25,17 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        return redirect()->intended(route('pieprasijumi.index'));
+        $user = Auth::user();
+        $role = strtolower(trim($user->role ?? ''));
+
+        if ($role === 'farmaceiti') {
+            return redirect()->route('pasutijumi.index');
+        }
+
+        // default for brivibas, kruzes, others
+        return redirect()->route('pieprasijumi.index');
     }
 
     /**

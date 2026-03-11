@@ -42,7 +42,9 @@
                 <th style="width:14%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Vārds Uzvārds</th>
                 <th style="width:10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Tālr. e-pasts</th>
                 <th style="width:10%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Pasūtījuma datums</th>
+                @if(auth()->check() && strtolower(auth()->user()->role) !== 'farmaceiti')
                 <th style="width:5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">-</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -66,7 +68,7 @@
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->vards_uzvards }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->talrunis_epasts }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">{{ optional($p->pasutijuma_datums)->format('d/m/Y') }}</td>
-
+                    @if(auth()->check() && strtolower(auth()->user()->role) !== 'farmaceiti')
                     <td style="border: 1px solid #080000ff; padding: 4px;">
                         <button type="button" class="btn btn-sm btn-primary edit-btn"
                                 data-id="{{ $p->id }}"
@@ -95,6 +97,7 @@
                             </button>
                         </form>
                     </td>
+                    @endif
                 </tr>
                 <tr class="additional-info" style="display:none;">
                     <td colspan="11" style="background-color: #f8f9fa; border: 1px solid #080000ff;">

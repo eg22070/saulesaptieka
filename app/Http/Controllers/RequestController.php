@@ -13,6 +13,10 @@ class RequestController extends Controller
 {
     public function index(Request $request)
     {
+        if (auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti') {
+            abort(403);
+        }
+
         $query = Requests::with(['aptiekas', 'artikuli']);
         $status_filter = $request->has('status_filter')
         ? $request->input('status_filter')
