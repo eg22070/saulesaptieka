@@ -64,6 +64,23 @@
 
             // Also save on manual reload / other navigations
             window.addEventListener('beforeunload', saveScrollPosition);
+
+                const TIMEOUT_MINUTES = {{ (int) env('SESSION_LIFETIME', 120) }};
+                const TIMEOUT_MS = TIMEOUT_MINUTES * 60 * 1000;
+                let timer;
+
+                function resetTimer() {
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        window.location.href = "{{ route('login') }}";
+                    }, TIMEOUT_MS);
+                }
+
+                ['click','mousemove','keydown','scroll','touchstart'].forEach(evt => {
+                    window.addEventListener(evt, resetTimer, { passive: true });
+                });
+
+                resetTimer();
         });
         </script>
     </body>

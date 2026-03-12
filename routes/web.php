@@ -5,13 +5,24 @@ use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\PasutijumiController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Redirect the root URL to the login page for guests
-Route::redirect('/', '/login')->middleware('guest');
+Route::middleware('guest')->get('/', function () {
+    return redirect()->route('login');
+});
 
-// Set the 'pieprasijumi.index' as the landing page for authenticated users
-Route::redirect('/', '/pieprasijumi')->middleware('auth');
+Route::middleware('auth')->get('/', function () {
+    $user = Auth::user();
+    $role = strtolower(trim($user->role ?? ''));
+
+    if ($role === 'farmaceiti') {
+        return redirect()->route('pasutijumi.index');
+    }
+
+    // default for brivibas, kruzes, others
+    return redirect()->route('pieprasijumi.index');
+});
 
 Route::resource('pasutijumi', PasutijumiController::class);
 Route::resource('pharmacies', PharmacyController::class);
