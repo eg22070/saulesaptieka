@@ -1,6 +1,5 @@
 @php $artikuliMap = $artikuli->keyBy('id'); @endphp
 
-<form action="{{ route('pasutijumi.index') }}" method="GET" id="bulkForm">
 
     {{ $pasutijumi->links() }}
 
@@ -87,12 +86,16 @@
                             Labot
                         </button>
 
-                        <form action="{{ route('pasutijumi.destroy', $p->id) }}" method="POST" style="display:inline;">
+                        <form id="delete-form-{{ $p->id }}"
+                            action="{{ route('pasutijumi.destroy', $p->id) }}"
+                            method="POST"
+                            style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" name="return_url" value="{{ url()->full() }}">
-                            <button type="button" class="btn btn-sm btn-danger"
-                                    onclick="if(confirm('Dzēst?')) this.closest('form').submit();">
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="if(confirm('Dzēst?')) document.getElementById('delete-form-{{ $p->id }}').submit();">
                                 Dzēst
                             </button>
                         </form>
@@ -131,7 +134,6 @@
     </table>
 
     {{ $pasutijumi->links() }}
-</form>
 
 <style>
     .toggle-details:hover {
