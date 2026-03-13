@@ -65,7 +65,7 @@ class PasutijumiController extends Controller
             }
         }
 
-        $pasutijumi = $query->paginate(25)->appends($request->query());
+        $pasutijumi = $query->paginate(50)->appends($request->query());
         $artikuli = Product::orderBy('nosaukums')->get();
 
         if ($request->ajax()) {
@@ -77,10 +77,15 @@ class PasutijumiController extends Controller
 
     public function store(Request $request)
     {
+        $input = $request->all();
+        if (isset($input['skaits'])) {
+            $input['skaits'] = str_replace(',', '.', $input['skaits']);
+        }
+        $request->replace($input);
         $data = $request->validate([
             'datums' => 'required|date_format:d/m/Y',
             'artikula_id' => 'required|exists:artikuli,id',
-            'skaits' => 'required|integer|min:1',
+            'skaits' => 'required|numeric|min:0.01',
             'vards_uzvards' => 'required|string|max:255',
             'pasutijuma_numurs' => 'nullable|string|max:191',
             'receptes_numurs' => 'nullable|string|max:191',
@@ -128,10 +133,14 @@ class PasutijumiController extends Controller
 
     public function update(Request $request, Pasutijums $pasutijumi)
     {
+        $input = $request->all();
+        if (isset($input['skaits'])) {
+            $input['skaits'] = str_replace(',', '.', $input['skaits']);
+        }
         $data = $request->validate([
             'datums' => 'required|date_format:d/m/Y',
             'artikula_id' => 'required|exists:artikuli,id',
-            'skaits' => 'required|integer|min:1',
+            'skaits' => 'required|numeric|min:0.01',
             'vards_uzvards' => 'required|string|max:255',
             'pasutijuma_numurs' => 'nullable|string|max:191',
             'receptes_numurs' => 'nullable|string|max:191',

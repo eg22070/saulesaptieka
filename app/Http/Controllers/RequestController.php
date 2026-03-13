@@ -62,14 +62,25 @@ class RequestController extends Controller
             }
         }
         // date range filter
-        if ($request->filled('date_from') && $request->filled('date_to')) {
-            try {
-                $from = Carbon::createFromFormat('d/m/Y', $request->input('date_from'))->startOfDay();
-                $to   = Carbon::createFromFormat('d/m/Y', $request->input('date_to'))->endOfDay();
+        $dateFrom = $request->query('date_from');
+        $dateTo   = $request->query('date_to');
 
-                $query->whereBetween('created_at', [$from->format('Y-m-d'), $to->format('Y-m-d')]);
+        if ($dateFrom && $dateTo) {
+            try {
+                $from = \Carbon\Carbon::createFromFormat('d/m/Y', $dateFrom);
+                $to   = \Carbon\Carbon::createFromFormat('d/m/Y', $dateTo);
+
+                // If same day: use whereDate =
+                if ($from->isSameDay($to)) {
+                    $query->whereDate('created_at', $from->toDateString());
+                } else {
+                    $query->whereBetween('created_at', [
+                        $from->startOfDay(),
+                        $to->endOfDay(),
+                    ]);
+                }
             } catch (\Exception $e) {
-                // ignore invalid date input or handle as you like
+                // ignore parse errors
             }
         }
         $artikuli = Product::all();

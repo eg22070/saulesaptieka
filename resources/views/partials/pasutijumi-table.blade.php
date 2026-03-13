@@ -48,11 +48,25 @@
         </thead>
         <tbody>
             @forelse($pasutijumi as $p)
-                @php $s = strtolower($p->statuss ?? 'neizpildits'); @endphp
+                @php
+                    // $p->skaits is decimal in DB
+                    $sk = (float) $p->skaits;
+                    // if integer, show without decimals; otherwise show as is
+                    $skaitsDisplay = fmod($sk, 1) == 0.0 ? (int) $sk : rtrim(rtrim(number_format($sk, 2, ',', ''), '0'), ',');
+                @endphp
+                @php
+                    $s = strtolower($p->statuss ?? 'neizpildits');
+                    $statusLabels = [
+                        'izpildits'   => 'izpildīts',
+                        'neizpildits' => 'neizpildīts',
+                        'atcelts'     => 'atcelts',
+                    ];
+                    $displayStatus = $statusLabels[$s] ?? $s;
+                @endphp
                 <tr class="request-row status-{{ \Illuminate\Support\Str::slug($s) }}" style="">
                     <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">
                         <span class="badge-status badge-status-{{ \Illuminate\Support\Str::slug($s) }}">
-                            {{ $s }}
+                            {{ $displayStatus }}
                         </span>
                     </td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->datums?->format('d/m/Y') }}</td>
@@ -61,9 +75,13 @@
                         title="Klikšķiniet, lai redzētu detaļas">
                         <b>{{ $p->product?->nosaukums ?? ($artikuliMap[$p->artikula_id]->nosaukums ?? '-') }}</b>
                     </td>
-                    <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">{{ $p->skaits }}</td>
+                    <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">
+                        {{ $skaitsDisplay }}
+                    </td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->pasutijuma_numurs }}</td>
-                    <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->receptes_numurs }}</td>
+                    <td style="border: 1px solid #080000ff; padding: 4px;">
+                        {!! nl2br(e(str_replace(' ', "\n", $p->receptes_numurs))) !!}
+                    </td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->vards_uzvards }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->talrunis_epasts }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">{{ optional($p->pasutijuma_datums)->format('d/m/Y') }}</td>
@@ -110,7 +128,7 @@
                             @if($p->creator)
                                 {{ $p->creator->name }}
                                 @if($p->created_at)
-                                    ({{ $p->created_at->format('d/m/Y H:i') }})
+                                    ({{ $p->created_at->format('d/m/Y') }})
                                 @endif
                             @else
                                 -
@@ -119,7 +137,7 @@
                             @if($p->statuss === 'izpildits' && $p->completer)
                                 {{ $p->completer->name }} 
                                 @if($p->completed_at)
-                                    ({{ $p->completed_at->format('d/m/Y H:i') }})
+                                    ({{ $p->completed_at->format('d/m/Y') }})
                                 @endif
                             @else
                                 -
