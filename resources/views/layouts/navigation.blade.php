@@ -60,6 +60,11 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(auth()->check() && strtolower(auth()->user()->role) === 'brivibas')
+                            <x-dropdown-link :href="route('users.index')">
+                                {{ __('User Management') }}
+                            </x-dropdown-link>
+                        @endif
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>

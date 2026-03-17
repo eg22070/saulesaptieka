@@ -56,8 +56,7 @@
     <tbody>
         @forelse ($pieprasijumi as $art)
             <!-- Main Row -->
-            <tr class="request-row {{ $art->cito ? 'request-row-cito' : '' }}"
-                style="background-color: {{ $loop->odd ? '#ffffff' : '#f0f0f0' }};">
+            <tr class="request-row {{ $art->cito ? 'request-row-cito' : '' }}">
                 <td style="border:1px solid #080000ff; padding:4px; text-align:center; vertical-align:middle;">
                     @if(!$art->completed)
                         <input type="checkbox"
@@ -199,10 +198,7 @@
         color: #ffffff;
     }
 
-    /* Hover color for main rows */
-    .custom-requests-table .request-row:hover {
-        background-color: #b0e6ee !important;
-    }
+
     .badge-pill {
     display: inline-block;
     padding: 2px 10px;
@@ -212,8 +208,22 @@
     border: 1px solid transparent;
     white-space: nowrap;
     }
-    .request-row-cito {
-    background-color: #fff8b3 !important; /* light yellow */
+    .request-row {
+        background-color: #f1eae3 !important; /* non-cito default */
+    }
+    /* CITO rows override */
+    .request-row.request-row-cito {
+        background-color: #fff8b3 !important; /* light yellow as you had */
+    }
+
+    /* Hover for non-cito rows */
+    .request-row:not(.request-row-cito):hover {
+        background-color: rgba(241,234,227,0.5) !important; /* same color, 50% */
+    }
+
+    /* Hover for CITO rows – slightly darker/lighter */
+    .request-row.request-row-cito:hover {
+        background-color: #ffe97a !important; /* tweak as you like */
     }
     .copy-btn {
         border: none;

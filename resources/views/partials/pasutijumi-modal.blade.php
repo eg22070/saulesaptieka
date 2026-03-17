@@ -41,7 +41,7 @@
                     <div class="mb-2 d-flex align-items-center">
                         <label class="me-3" style="width:130px;">Skaits</label>
                         <input id="m_skaits" type="number" name="skaits"
-                        min="1" step="0.01"
+                        min="0" step="0.01"
                         class="form-control" style="width:120px;" required>
                     </div>
 
