@@ -129,8 +129,8 @@
                                 <strong>ATĶ:</strong> {{ $artikuls->atk ?: '-' }}<br>
                                 <strong>Info:</strong> {{ $artikuls->info ?: '-' }}<br>
                                 <strong>Pielietojums:</strong> {{ $artikuls->pielietojums ?: '-' }}<br>
-                                <strong>Paslēpts no Krūzes ielas:</strong> {{ $artikuls->hide_from_farmaceiti ? 'Nē' : 'Jā' }}<br>
-                                <strong>Paslēpts no farmaceitiem:</strong> {{ $artikuls->hide_from_kruzes ? 'Nē' : 'Jā' }}
+                                <strong>Paslēpts no Krūzes ielas:</strong> {{ $artikuls->hide_from_kruzes ? 'Jā' : 'Nē' }}<br>
+                                <strong>Paslēpts no farmaceitiem:</strong> {{ $artikuls->hide_from_farmaceiti ? 'Jā' : 'Nē' }}
                             </div>
                         </td>
                     </tr>
