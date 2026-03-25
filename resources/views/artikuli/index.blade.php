@@ -54,6 +54,7 @@
     </div>
 </x-app-layout>
 <!-- Artikelus Modal -->
+ @php $role = strtolower(auth()->user()->role ?? ''); @endphp
 <div class="modal fade" id="artikuliModal" tabindex="-1" aria-labelledby="artikuliModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -91,6 +92,32 @@
                 <label for="atzimes" class="form-label">Īpašās atzīmes</label>
                 <textarea class="form-control" id="atzimes" name="atzimes" rows="3"></textarea>
             </div>
+            @if($role === 'brivibas')
+                <div class="mb-2">
+                    <label>ATĶ</label>
+                    <input type="text" name="atk" id="m_atk" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label>Info</label>
+                    <textarea name="info" id="m_info" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Pielietojums</label>
+                    <textarea name="pielietojums" id="m_pielietojums" class="form-control" rows="2"></textarea>
+                </div>
+                <input type="hidden" name="hide_from_kruzes" value="0">
+                <input type="hidden" name="hide_from_kruzes" value="0">
+                <div class="mb-2 form-check">
+                    <input type="checkbox" id="hide_from_kruzes" name="hide_from_kruzes" value="1" class="form-check-input">
+                    <label for="hide_from_kruzes" class="form-check-label">Slēpt no Krūzes ielas</label>
+                </div>
+                <input type="hidden" name="hide_from_farmaceiti" value="0">
+                <input type="hidden" name="hide_from_farmaceiti" value="0">
+                <div class="mb-2 form-check">
+                    <input type="checkbox" id="hide_from_farmaceiti" name="hide_from_farmaceiti" value="1" class="form-check-input">
+                    <label for="hide_from_farmaceiti" class="form-check-label">Slēpt no farmaceitiem</label>
+                </div>
+            @endif
         </div>
 
         <div class="modal-footer">
@@ -158,6 +185,11 @@
       modalTitle.textContent = 'Pievienot jaunu artikulu';
       saveBtn.textContent = 'Saglabāt';
 
+      const chkHideKruzes = document.getElementById('hide_from_kruzes');
+      const chkHideFarm   = document.getElementById('hide_from_farmaceiti');
+      if (chkHideKruzes) chkHideKruzes.checked = false;
+      if (chkHideFarm)   chkHideFarm.checked   = false;
+
       if (searchHidden && searchInput) {
         searchHidden.value = searchInput.value;
     }
@@ -178,6 +210,9 @@
         const analogs   = btn.dataset.analogs;
         const atzimes   = btn.dataset.atzimes;
 
+        const hideFromKruzes     = btn.dataset.hide_from_kruzes;
+        const hideFromFarmaceiti = btn.dataset.hide_from_farmaceiti;
+
         form.action = "/artikuli/" + id;
 
         let methodInput = form.querySelector('input[name="_method"]');
@@ -197,6 +232,24 @@
         document.getElementById('analogs').value  = analogs;
         document.getElementById('atzimes').value  = atzimes;
 
+        // fill extra fields for brivibas if they exist
+        const atkInput   = document.getElementById('atk');
+        const infoInput  = document.getElementById('info');
+        const pielInput  = document.getElementById('pielietojums');
+        if (atkInput)  atkInput.value  = btn.dataset.atk  || '';
+        if (infoInput) infoInput.value = btn.dataset.info || '';
+        if (pielInput) pielInput.value = btn.dataset.pielietojums || '';
+
+        // set checkboxes if present
+        const chkHideKruzes = document.getElementById('hide_from_kruzes');
+        const chkHideFarm   = document.getElementById('hide_from_farmaceiti');
+
+        if (chkHideKruzes) {
+            chkHideKruzes.checked = (hideFromKruzes === '1' || hideFromKruzes === 1);
+        }
+        if (chkHideFarm) {
+            chkHideFarm.checked = (hideFromFarmaceiti === '1' || hideFromFarmaceiti === 1);
+        }
         // Set modal title and button
         modalTitle.textContent = 'Labot artikulu';
         saveBtn.textContent    = 'Atjaunināt';

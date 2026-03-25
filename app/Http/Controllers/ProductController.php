@@ -13,7 +13,13 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::query();
+        $role = strtolower(auth()->user()->role ?? '');
 
+        if ($role === 'kruzes') {
+            $query->where('hide_from_kruzes', false);
+        } elseif ($role === 'farmaceiti') {
+            $query->where('hide_from_farmaceiti', false);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nosaukums', 'like', "%{$search}%")
@@ -42,21 +48,50 @@ class ProductController extends Controller
         return view('artikuli.create'); // create.blade.php
     }
 
+    protected function role()
+    {
+        return strtolower(auth()->user()->role ?? '');
+    }
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $role = $this->role();
+
+        $rules = [
             'nosaukums' => 'required|string|max:255',
             'id_numurs' => 'nullable|string|max:255',
             'valsts' => 'nullable|string|max:255',
             'snn' => 'nullable|string',
             'analogs' => 'nullable|string|max:255',
             'atzimes' => 'nullable|string',
-        ]);
+        ];
 
-        Product::create($validated);
+        if ($role === 'brivibas') {
+            $rules = array_merge($rules, [
+                    'atk' => 'nullable|string|max:50',
+                    'info' => 'nullable|string',
+                    'pielietojums' => 'nullable|string',
+                    'hide_from_kruzes' => 'boolean',
+                    'hide_from_farmaceiti' => 'boolean',
+                ]);
+            }
+        
+        $data = $request->validate($rules);
+        // normalize checkboxes
+        $data['hide_from_kruzes'] = $request->boolean('hide_from_kruzes');
+        $data['hide_from_farmaceiti'] = $request->boolean('hide_from_farmaceiti');
+        
+        if ($role === 'kruzes') {
+            // ignore hidden/extra fields
+            unset($data['atk'], $data['info'], $data['pielietojums'], $data['hide_from_kruzes'], $data['hide_from_farmaceiti']);
+        } elseif ($role === 'farmaceiti') {
+            // farmaceiti should not create/edit at all
+            abort(403);
+        }
+
+        Product::create($data);
 
         return redirect()->back()->with('success', 'Artikuls veiksmīgi pievienots');
     }
@@ -84,17 +119,42 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        $role = $this->role();
+
+        $rules = [
             'nosaukums' => 'required|string|max:255',
             'id_numurs' => 'nullable|string|max:255',
             'valsts' => 'nullable|string|max:255',
             'snn' => 'nullable|string',
             'analogs' => 'nullable|string|max:255',
             'atzimes' => 'nullable|string',
-        ]);
+        ];
+
+        if ($role === 'brivibas') {
+            $rules = array_merge($rules, [
+                    'atk' => 'nullable|string|max:50',
+                    'info' => 'nullable|string',
+                    'pielietojums' => 'nullable|string',
+                    'hide_from_kruzes' => 'boolean',
+                    'hide_from_farmaceiti' => 'boolean',
+                ]);
+            }
+        
+        $data = $request->validate($rules);
+        // normalize checkboxes
+        $data['hide_from_kruzes'] = $request->boolean('hide_from_kruzes');
+        $data['hide_from_farmaceiti'] = $request->boolean('hide_from_farmaceiti');
+        
+        if ($role === 'kruzes') {
+            // ignore hidden/extra fields
+            unset($data['atk'], $data['info'], $data['pielietojums'], $data['hide_from_kruzes'], $data['hide_from_farmaceiti']);
+        } elseif ($role === 'farmaceiti') {
+            // farmaceiti should not create/edit at all
+            abort(403);
+        }
 
         $product = Product::findOrFail($id);
-        $product->update($validated);
+        $product->update($data);
 
         return redirect()->back()->with('success', 'Artikuls veiksmīgi atjaunināts');
     }

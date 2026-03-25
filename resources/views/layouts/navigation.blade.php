@@ -28,12 +28,9 @@
                         </x-nav-link>
                     @endif
 
-                    {{-- Artikuli: brivibas + kruzes --}}
-                    @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
                         <x-nav-link :href="route('artikuli.index')" :active="request()->routeIs('artikuli.*')">
                             {{ __('Artikuli') }}
                         </x-nav-link>
-                    @endif
 
                     {{-- Aptiekas: brivibas + kruzes --}}
                     @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
