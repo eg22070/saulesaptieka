@@ -27,6 +27,7 @@
                 @forelse ($products as $artikuls)
                     @php
                         $roleIsBrivibas = $role === 'brivibas';
+                        $hoverBgForThisRow = '';
 
                         // Visibility categories based on hide flags (brivibas only).
                         if ($roleIsBrivibas) {
@@ -41,20 +42,21 @@
                             } elseif (!$hideFromKruzes && $hideFromFarmaceiti) {
                                 // Only Kruzes can see
                                 $visibilityClass = 'vis-kruzes-only';
-                                $bgOdd = '#f2fbff';
+                                $bgOdd = '#e4f6ff';
                                 $bgEven = '#e4f6ff';
                                 $detailBg = '#e9faff';
                             } elseif ($hideFromKruzes && !$hideFromFarmaceiti) {
                                 // Only Farmaceiti can see
                                 $visibilityClass = 'vis-farmaceiti-only';
-                                $bgOdd = '#fff6ee';
-                                $bgEven = '#ffeede';
-                                $detailBg = '#fff0dc';
+                                // Stronger warm palette so it's clearly distinguishable from "everyone".
+                                $bgOdd = '#ffd4a4';
+                                $bgEven = '#ffd4a4';
+                                $detailBg = '#ffc894';
                             } else {
                                 // Hidden from both (should normally not appear)
                                 $visibilityClass = 'vis-hidden';
-                                $bgOdd = '#fafafa';
-                                $bgEven = '#f2f2f2';
+                                $bgOdd = '#e9a58d';
+                                $bgEven = '#e9a58d';
                                 $detailBg = '#f6f6f6';
                             }
                         } else {
@@ -64,9 +66,21 @@
                             $bgEven = '#f1eae3';
                             $detailBg = '#f8f9fa';
                         }
+
+                        if ($roleIsBrivibas) {
+                            // Convert the visible base background color to RGBA for hover overlay.
+                            // This ensures opacity is derived from the same $bgOdd/$bgEven the row uses.
+                            $baseBgForRow = $loop->odd ? $bgOdd : $bgEven;
+                            $baseBgHex = ltrim($baseBgForRow, '#');
+                            $r = hexdec(substr($baseBgHex, 0, 2));
+                            $g = hexdec(substr($baseBgHex, 2, 2));
+                            $b = hexdec(substr($baseBgHex, 4, 2));
+                            $hoverBgForThisRow = "rgba($r,$g,$b,0.5)";
+                        }
                     @endphp
 
-                    <tr class="artikuli-row {{ $roleIsBrivibas ? $visibilityClass : '' }}" style="background-color: {{ $loop->odd ? $bgOdd : $bgEven }};">
+                    <tr class="artikuli-row {{ $roleIsBrivibas ? $visibilityClass : '' }}"
+                        style="background-color: {{ $loop->odd ? $bgOdd : $bgEven }}; {{ $roleIsBrivibas ? '--hover-bg:' . $hoverBgForThisRow . ';' : '' }}">
                     @if($role === 'farmaceiti')    
                         @php
                             $atkValidityDays = (int) ($artikuls->atk_validity_days ?? 90);
@@ -132,9 +146,29 @@
                     {{-- Additional info for brivibas only --}}
                 @if($role === 'brivibas')
                     <tr class="additional-info {{ $visibilityClass }}" style="display:none;">
-                        <td colspan="7" style="background-color:{{ $detailBg }}; border:1px solid #080000ff;">
+                        <td colspan="7" style="background-color:{{ $hoverBgForThisRow ?: $detailBg }}; border:1px solid #080000ff;">
                             <div style="padding:10px;">
-                                <strong>ATĶ:</strong> {{ $artikuls->atk ?: '-' }}<br>
+                                @php
+                                    $atkValidityDaysForDot = (int) ($artikuls->atk_validity_days ?? 90);
+                                    $atkDotBg = $atkValidityDaysForDot === 90 ? '#ffcccc' : '#ccffcc';
+                                    $atkDotBorder = $atkValidityDaysForDot === 90 ? '#7a0000' : '#006600';
+                                @endphp
+                                <strong>ATĶ:</strong>
+                                {{ $artikuls->atk ?: '-' }}
+                                <span
+                                    title="{{ $atkValidityDaysForDot === 90 ? '90 dienas' : '1 gads' }}"
+                                    style="
+                                        display:inline-block;
+                                        width:12px;
+                                        height:12px;
+                                        margin-left:8px;
+                                        border-radius:999px;
+                                        background-color:{{ $atkDotBg }};
+                                        border:2px solid {{ $atkDotBorder }};
+                                        vertical-align:middle;
+                                    "
+                                ></span>
+                                <br>
                                 <strong>Info:</strong> {{ $artikuls->info ?: '-' }}<br>
                                 <strong>Pielietojums:</strong> {{ $artikuls->pielietojums ?: '-' }}<br>
                                 <strong>Paslēpts no Krūzes ielas:</strong> {{ $artikuls->hide_from_kruzes ? 'Jā' : 'Nē' }}<br>
@@ -167,16 +201,16 @@
 
     @if($role === 'brivibas')
         .custom-artikuli-table tr.vis-everyone:hover {
-            background-color: rgba(241,234,227,0.5) !important;
+            background-color: var(--hover-bg) !important;
         }
         .custom-artikuli-table tr.vis-kruzes-only:hover {
-            background-color: #bfefff !important;
+            background-color: var(--hover-bg) !important;
         }
         .custom-artikuli-table tr.vis-farmaceiti-only:hover {
-            background-color: #ffd7ab !important;
+            background-color: var(--hover-bg) !important;
         }
         .custom-artikuli-table tr.vis-hidden:hover {
-            background-color: #efefef !important;
+            background-color: var(--hover-bg) !important;
         }
     @else
         /* Default row look (same as pieprasijumi non-cito rows) */
