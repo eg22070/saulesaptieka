@@ -31,7 +31,15 @@ class ProductController extends Controller
             $snn = $request->input('snn');
             $query->where('snn', 'like', "%{$snn}%");
         }
-        $products = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
+
+        // Role-based ordering:
+        // - farmaceiti: sort by SNN
+        // - others: sort by nosaukums (current default)
+        if ($role === 'farmaceiti') {
+            $products = $query->orderBy('snn')->paginate(50)->appends($request->query());
+        } else {
+            $products = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
+        }
 
         if ($request->ajax()) {
             return view('partials.artikuli-table', compact('products'))->render();
@@ -71,6 +79,7 @@ class ProductController extends Controller
         if ($role === 'brivibas') {
             $rules = array_merge($rules, [
                     'atk' => 'nullable|string|max:50',
+                    'atk_validity_days' => 'nullable|in:90,365',
                     'info' => 'nullable|string',
                     'pielietojums' => 'nullable|string',
                     'hide_from_kruzes' => 'boolean',
@@ -82,6 +91,10 @@ class ProductController extends Controller
         // normalize checkboxes
         $data['hide_from_kruzes'] = $request->boolean('hide_from_kruzes');
         $data['hide_from_farmaceiti'] = $request->boolean('hide_from_farmaceiti');
+        // Default validity to 1 gads when not provided.
+        if ($role === 'brivibas') {
+            $data['atk_validity_days'] = $data['atk_validity_days'] ?? 90;
+        }
         
         if ($role === 'kruzes') {
             // ignore hidden/extra fields
@@ -133,6 +146,7 @@ class ProductController extends Controller
         if ($role === 'brivibas') {
             $rules = array_merge($rules, [
                     'atk' => 'nullable|string|max:50',
+                    'atk_validity_days' => 'nullable|in:90,365',
                     'info' => 'nullable|string',
                     'pielietojums' => 'nullable|string',
                     'hide_from_kruzes' => 'boolean',
@@ -144,6 +158,9 @@ class ProductController extends Controller
         // normalize checkboxes
         $data['hide_from_kruzes'] = $request->boolean('hide_from_kruzes');
         $data['hide_from_farmaceiti'] = $request->boolean('hide_from_farmaceiti');
+        if ($role === 'brivibas') {
+            $data['atk_validity_days'] = $data['atk_validity_days'] ?? 90;
+        }
         
         if ($role === 'kruzes') {
             // ignore hidden/extra fields

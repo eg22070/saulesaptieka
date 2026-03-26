@@ -68,7 +68,14 @@
 
                     <tr class="artikuli-row {{ $roleIsBrivibas ? $visibilityClass : '' }}" style="background-color: {{ $loop->odd ? $bgOdd : $bgEven }};">
                     @if($role === 'farmaceiti')    
-                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->atk }}</td>
+                        @php
+                            $atkValidityDays = (int) ($artikuls->atk_validity_days ?? 90);
+                            $atkBg = $atkValidityDays === 90 ? '#ffcccc' : '#ccffcc';
+                            $atkText = $atkValidityDays === 90 ? '#7a0000' : '#006600';
+                        @endphp
+                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle; background-color: {{ $atkBg }}; color: {{ $atkText }};">
+                            {{ $artikuls->atk }}
+                        </td>
                         <td class="snn-cell" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">
                             {!! nl2br(e($artikuls->snn)) !!}
                         </td>
@@ -105,6 +112,7 @@
                                         data-atzimes="{{ $artikuls->atzimes }}"
                                         @if($role === 'brivibas')
                                             data-atk="{{ $artikuls->atk }}"
+                                            data-atk_validity_days="{{ $artikuls->atk_validity_days }}"
                                             data-info="{{ $artikuls->info }}"
                                             data-pielietojums="{{ $artikuls->pielietojums }}"
                                             data-hide_from_farmaceiti="{{ $artikuls->hide_from_farmaceiti ? 1 : 0 }}"

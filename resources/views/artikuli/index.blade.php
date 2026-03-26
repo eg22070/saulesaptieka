@@ -42,7 +42,10 @@
         </form>
 
         <!-- Add Artikuls Button -->
-        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#artikuliModal" id="addArtikulsBtn">Pievienot jaunu artikulu</button>
+        @php $role = strtolower(auth()->user()->role ?? ''); @endphp
+        @if($role !== 'farmaceiti')
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#artikuliModal" id="addArtikulsBtn">Pievienot jaunu artikulu</button>
+        @endif
 
        
                 
@@ -96,6 +99,13 @@
                 <div class="mb-2">
                     <label>ATĶ</label>
                     <input type="text" name="atk" id="m_atk" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label>Receptes derīguma termiņš</label>
+                    <select name="atk_validity_days" id="m_atk_validity_days" class="form-control">
+                        <option value="90" selected>90 dienas</option>
+                        <option value="365">1 gads</option>
+                    </select>
                 </div>
                 <div class="mb-2">
                     <label>Info</label>
@@ -233,12 +243,18 @@
         document.getElementById('atzimes').value  = atzimes;
 
         // fill extra fields for brivibas if they exist
-        const atkInput   = document.getElementById('atk');
-        const infoInput  = document.getElementById('info');
-        const pielInput  = document.getElementById('pielietojums');
+        // IDs in the modal are prefixed with "m_".
+        const atkInput   = document.getElementById('m_atk');
+        const infoInput  = document.getElementById('m_info');
+        const pielInput  = document.getElementById('m_pielietojums');
         if (atkInput)  atkInput.value  = btn.dataset.atk  || '';
         if (infoInput) infoInput.value = btn.dataset.info || '';
         if (pielInput) pielInput.value = btn.dataset.pielietojums || '';
+
+        const atkValidityInput = document.getElementById('m_atk_validity_days');
+        if (atkValidityInput) {
+            atkValidityInput.value = btn.dataset.atk_validity_days || '90';
+        }
 
         // set checkboxes if present
         const chkHideKruzes = document.getElementById('hide_from_kruzes');
