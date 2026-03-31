@@ -69,7 +69,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        @if(auth()->check() && strtolower(auth()->user()->role) === 'brivibas')
+                        @if(auth()->check() && strtolower(auth()->user()->role) === 'brivibas' && strtolower(auth()->user()->email ?? '') !== 'd.grazule@saulesaptieka.lv')
                             <x-dropdown-link :href="route('users.index')">
                                 {{ __('User Management') }}
                             </x-dropdown-link>
