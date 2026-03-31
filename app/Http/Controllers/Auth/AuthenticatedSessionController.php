@@ -29,6 +29,11 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
         $role = strtolower(trim($user->role ?? ''));
+        $isSpecialUser = strtolower(trim($user->email ?? '')) === 'd.grazule@saulesaptieka.lv';
+
+        if ($isSpecialUser) {
+            return redirect()->route('pasutijumi.index');
+        }
 
         if ($role === 'farmaceiti') {
             return redirect()->route('pasutijumi.index');
