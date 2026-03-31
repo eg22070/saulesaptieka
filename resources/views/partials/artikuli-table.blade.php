@@ -3,9 +3,11 @@
             <thead>
                 @php
                     $role = strtolower(auth()->user()->role ?? '');
+                    $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+                    $effectiveRole = $isSpecialUser ? 'farmaceiti' : $role;
                 @endphp
                 <tr>
-                    @if($role === 'farmaceiti')
+                    @if($effectiveRole === 'farmaceiti')
                     <th style="width: 5%; border: 1px solid #080000ff; padding: 4px; text-align: center;">ATĶ</th>
                     <th style="width: 20%; border: 1px solid #080000ff; padding: 4px; text-align: center;">SNN</th>
                     <th style="width: 25%; border: 1px solid #080000ff; padding: 4px; text-align: center;">Nosaukums</th>
@@ -26,7 +28,7 @@
             <tbody>
                 @forelse ($products as $artikuls)
                     @php
-                        $roleIsBrivibas = $role === 'brivibas';
+                        $roleIsBrivibas = $effectiveRole === 'brivibas';
                         $hoverBgForThisRow = '';
 
                         // Visibility categories based on hide flags (brivibas only).
@@ -81,7 +83,7 @@
 
                     <tr class="artikuli-row {{ $roleIsBrivibas ? $visibilityClass : '' }}"
                         style="background-color: {{ $loop->odd ? $bgOdd : $bgEven }}; {{ $roleIsBrivibas ? '--hover-bg:' . $hoverBgForThisRow . ';' : '' }}">
-                    @if($role === 'farmaceiti')    
+                    @if($effectiveRole === 'farmaceiti')    
                         @php
                             $atkValidityDays = (int) ($artikuls->atk_validity_days ?? 90);
                             $atkBg = $atkValidityDays === 90 ? '#ffcccc' : '#ccffcc';
@@ -100,9 +102,9 @@
                         <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->pielietojums }}</td>
                         <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->atzimes }}</td>
                     @else
-                        <td class="{{ $role === 'brivibas' ? 'toggle-details' : '' }}"
-                            style="border:1px solid #080000ff; padding:4px; cursor: {{ $role === 'brivibas' ? 'pointer' : 'default' }};"
-                            title="{{ $role === 'brivibas' ? 'Klikšķiniet, lai redzētu detaļas' : '' }}">
+                        <td class="{{ $effectiveRole === 'brivibas' ? 'toggle-details' : '' }}"
+                            style="border:1px solid #080000ff; padding:4px; cursor: {{ $effectiveRole === 'brivibas' ? 'pointer' : 'default' }};"
+                            title="{{ $effectiveRole === 'brivibas' ? 'Klikšķiniet, lai redzētu detaļas' : '' }}">
                             <b>{{ $artikuls->nosaukums }}</b>
                         </td>
                         <td style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->id_numurs }}</td>
@@ -113,7 +115,7 @@
                         <td style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->analogs }}</td>
                         <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->atzimes }}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
-                             @if($role !== 'farmaceiti')
+                             @if($effectiveRole !== 'farmaceiti')
                                 <button class="btn btn-sm btn-primary edit-artikuls-btn" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#artikuliModal"
@@ -124,7 +126,7 @@
                                         data-snn="{{ $artikuls->snn }}"
                                         data-analogs="{{ $artikuls->analogs }}"
                                         data-atzimes="{{ $artikuls->atzimes }}"
-                                        @if($role === 'brivibas')
+                                        @if($effectiveRole === 'brivibas')
                                             data-atk="{{ $artikuls->atk }}"
                                             data-atk_validity_days="{{ $artikuls->atk_validity_days }}"
                                             data-info="{{ $artikuls->info }}"
@@ -144,7 +146,7 @@
                     @endif
                 </tr>           
                     {{-- Additional info for brivibas only --}}
-                @if($role === 'brivibas')
+                @if($effectiveRole === 'brivibas')
                     <tr class="additional-info {{ $visibilityClass }}" style="display:none;">
                         <td colspan="7" style="background-color:{{ $hoverBgForThisRow ?: $detailBg }}; border:1px solid #080000ff;">
                             <div style="padding:10px;">
@@ -199,7 +201,7 @@
         color: #0d6efd; /* Bootstrap primary blue */
     }
 
-    @if($role === 'brivibas')
+    @if($effectiveRole === 'brivibas')
         .custom-artikuli-table tr.vis-everyone:hover {
             background-color: var(--hover-bg) !important;
         }

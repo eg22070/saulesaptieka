@@ -11,7 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'block_special_user' => \App\Http\Middleware\BlockSpecialUser::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

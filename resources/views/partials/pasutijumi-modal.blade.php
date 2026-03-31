@@ -86,6 +86,16 @@
                             <option value="atcelts">Atcelts</option>
                         </select>
                     </div>
+                    @if(strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv')
+                    <input type="hidden" name="hide_from_visiem" value="0">
+                    <div class="mb-2 d-flex align-items-center">
+                        <label class="me-3" style="width:130px;">Privātums</label>
+                        <div class="form-check m-0">
+                            <input id="m_hide_from_visiem" type="checkbox" name="hide_from_visiem" value="1" class="form-check-input">
+                            <label for="m_hide_from_visiem" class="form-check-label">Slēpt no visiem</label>
+                        </div>
+                    </div>
+                    @endif
                 </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Atcelt</button>

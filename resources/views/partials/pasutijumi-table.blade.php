@@ -16,6 +16,7 @@
                     $query = [
                         'search'        => request('search'),
                         'status_filter' => request('status_filter', request('status_filter', 'neizpildits')),
+                        'mine_filter'   => request('mine_filter', 'all'),
                         'date_from'     => request('date_from'),
                         'date_to'       => request('date_to'),
                         'sort'          => 'datums',
@@ -55,6 +56,10 @@
                     $skaitsDisplay = fmod($sk, 1) == 0.0 ? (int) $sk : rtrim(rtrim(number_format($sk, 2, ',', ''), '0'), ',');
                 @endphp
                 @php
+                    $isSpecialUser = auth()->check() && strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+                    $canManageThisOrder = !$isSpecialUser || ((int) $p->created_by === (int) auth()->id());
+                @endphp
+                @php
                     $s = strtolower($p->statuss ?? 'neizpildits');
                     $statusLabels = [
                         'izpildits'   => 'izpildīts',
@@ -85,8 +90,8 @@
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->vards_uzvards }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->talrunis_epasts }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">{{ optional($p->pasutijuma_datums)->format('d/m/Y') }}</td>
-                    @if(auth()->check() && strtolower(auth()->user()->role) !== 'farmaceiti')
                     <td style="border: 1px solid #080000ff; padding: 4px;">
+                    @if(auth()->check() && strtolower(auth()->user()->role) !== 'farmaceiti' && $canManageThisOrder)
                         <button type="button" class="btn btn-sm btn-primary edit-btn"
                                 data-id="{{ $p->id }}"
                                 data-datums="{{ optional($p->datums)->format('d/m/Y') }}"
@@ -100,6 +105,7 @@
                                 data-pasutijuma_datums="{{ optional($p->pasutijuma_datums)->format('d/m/Y') }}"
                                 data-komentari="{{ ($p->komentari) }}"
                                 data-statuss="{{ $s }}"
+                                data-hide_from_visiem="{{ $p->hide_from_visiem ? 1 : 0 }}"
                                 data-bs-toggle="modal" data-bs-target="#pasutijumiModal">
                             Labot
                         </button>

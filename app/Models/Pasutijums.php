@@ -23,6 +23,7 @@ class Pasutijums extends Model
         'pasutijuma_datums',
         'komentari',
         'statuss',
+        'hide_from_visiem',
         'who_completed',
         'completed_at',
     ];

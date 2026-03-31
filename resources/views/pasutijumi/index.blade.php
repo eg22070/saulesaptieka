@@ -1,4 +1,7 @@
 <x-app-layout>
+    @php
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+    @endphp
     <x-slot name="header">
         @if ($errors->any())
             <div class="alert alert-danger" style="margin: 20px;">
@@ -44,6 +47,13 @@
                            value="{{ request('date_from') && request('date_to') ? request('date_from').' - '.request('date_to') : '' }}">
                     <input type="hidden" id="pas_date_from" name="date_from" value="{{ request('date_from') }}">
                     <input type="hidden" id="pas_date_to" name="date_to" value="{{ request('date_to') }}">
+                    @if($isSpecialUser)
+                        <label class="me-2 ms-3" style="margin-right:12px;">Rādīt:</label>
+                        <select id="pas_mine_filter" name="mine_filter" class="form-select form-select-sm" style="width:220px; margin-right:12px;">
+                            <option value="all"  {{ request('mine_filter', 'all') === 'all' ? 'selected' : '' }}>Visi pasūtījumi</option>
+                            <option value="mine" {{ request('mine_filter') === 'mine' ? 'selected' : '' }}>Dina</option>
+                        </select>
+                    @endif
                     <a href="{{ route('pasutijumi.index', ['status_filter' => 'neizpildits']) }}" class="btn btn-sm btn-outline-secondary ms-2">
                         Atiestatīt
                     </a>
@@ -101,6 +111,7 @@
                     status_filter: document.getElementById('pas_status_filter')?.value || 'neizpildits',
                     date_from: document.getElementById('pas_date_from').value || '',
                     date_to: document.getElementById('pas_date_to').value || '',
+                    mine_filter: document.getElementById('pas_mine_filter')?.value || 'all',
                     sort: "{{ request('sort', 'datums') }}",
                     direction: "{{ request('direction', 'desc') }}",
                 });
@@ -116,6 +127,9 @@
         });
 
         document.getElementById('pas_status_filter')?.addEventListener('change', function () {
+            document.getElementById('pasSearchForm').submit();
+        });
+        document.getElementById('pas_mine_filter')?.addEventListener('change', function () {
             document.getElementById('pasSearchForm').submit();
         });
 
@@ -139,6 +153,7 @@
         const m_pasutijuma_datums = document.getElementById('m_pasutijuma_datums');
         const m_komentari = document.getElementById('m_komentari');
         const m_statuss = document.getElementById('m_statuss');
+        const m_hide_from_visiem = document.getElementById('m_hide_from_visiem');
         const m_complete_btn = document.getElementById('m_complete_btn');
         const datalist = document.getElementById('m_artikuli');
 
@@ -171,6 +186,7 @@
 
                 // clear/optional for pasūtījuma datums
                 if (m_pasutijuma_datums) m_pasutijuma_datums.value = '';
+                if (m_hide_from_visiem) m_hide_from_visiem.checked = false;
 
                 if (modal) modal.show();
             }
@@ -192,6 +208,7 @@
                 if (m_talrunis_epasts) m_talrunis_epasts.value = d.talrunis_epasts || '';
                 if (m_pasutijuma_datums) m_pasutijuma_datums.value = d.pasutijuma_datums || '';
                 if (m_komentari) m_komentari.value = d.komentari || '';
+                if (m_hide_from_visiem) m_hide_from_visiem.checked = (d.hide_from_visiem === '1' || d.hide_from_visiem === 1);
                 if (m_statuss) {
                     const currentStatus = (d.statuss || 'neizpildits').toLowerCase();
                     m_statuss.value = currentStatus;

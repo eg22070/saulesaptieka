@@ -1,4 +1,7 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+    @php
+        $isSpecialUser = auth()->check() && strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+    @endphp
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -14,6 +17,14 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    @if($isSpecialUser)
+                        <x-nav-link :href="route('pasutijumi.index')" :active="request()->routeIs('pasutijumi.*')">
+                            {{ __('Pasūtījumi') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('artikuli.index')" :active="request()->routeIs('artikuli.*')">
+                            {{ __('Artikuli') }}
+                        </x-nav-link>
+                    @else
                     {{-- Pieprasījumi: brivibas + kruzes --}}
                     @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
                         <x-nav-link :href="route('pieprasijumi.index')" :active="request()->routeIs('pieprasijumi.*')">
@@ -37,6 +48,7 @@
                         <x-nav-link :href="route('pharmacies.index')" :active="request()->routeIs('pharmacies.*')">
                             {{ __('Aptiekas') }}
                         </x-nav-link>
+                    @endif
                     @endif
                 </div>
             </div>

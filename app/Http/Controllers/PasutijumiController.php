@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Pasutijums;
 use App\Models\Product;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class PasutijumiController extends Controller
 {
     public function index(Request $request)
     {
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
         $sort      = $request->query('sort', 'datums');
         $direction = $request->query('direction', 'desc');
 
@@ -23,6 +25,16 @@ class PasutijumiController extends Controller
         }
 
         $query = Pasutijums::with('product')->orderBy($sort, $direction);
+
+        // Hidden-from-everyone orders are visible only to the special user.
+        if (!$isSpecialUser) {
+            $query->where('hide_from_visiem', false);
+        }
+
+        // Extra filter shown only to the special user.
+        if ($isSpecialUser && $request->query('mine_filter') === 'mine') {
+            $query->where('created_by', auth()->id());
+        }
 
         // search
         if ($search = $request->query('search')) {
@@ -77,6 +89,7 @@ class PasutijumiController extends Controller
 
     public function store(Request $request)
     {
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
         $input = $request->all();
         if (isset($input['skaits'])) {
             $input['skaits'] = str_replace(',', '.', $input['skaits']);
@@ -93,6 +106,7 @@ class PasutijumiController extends Controller
             'pasutijuma_datums' => 'nullable|date_format:d/m/Y',
             'komentari' => 'nullable|string',
             'statuss' => 'nullable|in:izpildits,neizpildits,atcelts',
+            'hide_from_visiem' => 'boolean',
         ]);
 
         if (!empty($data['datums'])) {
@@ -109,6 +123,10 @@ class PasutijumiController extends Controller
 
         if (empty($data['statuss'])) {
             $data['statuss'] = 'neizpildits';
+        }
+
+        if (Schema::hasColumn('pasutijumi', 'hide_from_visiem')) {
+            $data['hide_from_visiem'] = $isSpecialUser ? $request->boolean('hide_from_visiem') : false;
         }
 
         // default
@@ -133,6 +151,10 @@ class PasutijumiController extends Controller
 
     public function update(Request $request, Pasutijums $pasutijumi)
     {
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+        if ($isSpecialUser && (int) $pasutijumi->created_by !== (int) auth()->id()) {
+            abort(403);
+        }
         $input = $request->all();
         if (isset($input['skaits'])) {
             $input['skaits'] = str_replace(',', '.', $input['skaits']);
@@ -148,6 +170,7 @@ class PasutijumiController extends Controller
             'pasutijuma_datums' => 'nullable|date_format:d/m/Y',
             'komentari' => 'nullable|string',
             'statuss' => 'nullable|in:izpildits,neizpildits,atcelts',
+            'hide_from_visiem' => 'boolean',
         ]);
         if (!empty($data['datums'])) {
             $data['datums'] = Carbon::createFromFormat('d/m/Y', $data['datums'])->toDateString();
@@ -163,6 +186,10 @@ class PasutijumiController extends Controller
         
         if (empty($data['statuss'])) {
             $data['statuss'] = 'neizpildits';
+        }
+
+        if (Schema::hasColumn('pasutijumi', 'hide_from_visiem')) {
+            $data['hide_from_visiem'] = $isSpecialUser ? $request->boolean('hide_from_visiem') : false;
         }
 
         $wasCompleted = (bool) $pasutijumi->completed;
@@ -194,6 +221,11 @@ class PasutijumiController extends Controller
 
     public function destroy(Request $request, Pasutijums $pasutijumi)
     {
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+        if ($isSpecialUser && (int) $pasutijumi->created_by !== (int) auth()->id()) {
+            abort(403);
+        }
+
         $pasutijumi->delete();
 
         $returnUrl = $request->input('return_url');

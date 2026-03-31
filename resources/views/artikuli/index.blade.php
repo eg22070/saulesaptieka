@@ -1,4 +1,9 @@
 <x-app-layout>
+    @php
+        $role = strtolower(auth()->user()->role ?? '');
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+        $effectiveRole = $isSpecialUser ? 'farmaceiti' : $role;
+    @endphp
     <x-slot name="header">
         @if ($errors->any())
             <div class="alert alert-danger" style="margin: 20px;">
@@ -42,8 +47,7 @@
         </form>
 
         <!-- Add Artikuls Button -->
-        @php $role = strtolower(auth()->user()->role ?? ''); @endphp
-        @if($role !== 'farmaceiti')
+        @if($effectiveRole !== 'farmaceiti')
             <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#artikuliModal" id="addArtikulsBtn">Pievienot jaunu artikulu</button>
         @endif
 
@@ -57,7 +61,6 @@
     </div>
 </x-app-layout>
 <!-- Artikelus Modal -->
- @php $role = strtolower(auth()->user()->role ?? ''); @endphp
 <div class="modal fade" id="artikuliModal" tabindex="-1" aria-labelledby="artikuliModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -95,7 +98,7 @@
                 <label for="atzimes" class="form-label">Īpašās atzīmes</label>
                 <textarea class="form-control" id="atzimes" name="atzimes" rows="3"></textarea>
             </div>
-            @if($role === 'brivibas')
+            @if($effectiveRole === 'brivibas')
                 <div class="mb-2">
                     <label>ATĶ</label>
                     <input type="text" name="atk" id="m_atk" class="form-control">
@@ -181,7 +184,9 @@
         }
     }
     // Handle "Add" button click
-    document.getElementById('addArtikulsBtn').addEventListener('click', function () {
+    const addArtikulsBtn = document.getElementById('addArtikulsBtn');
+    if (addArtikulsBtn) {
+    addArtikulsBtn.addEventListener('click', function () {
       form.reset();
 
       // Set form to store route
@@ -204,6 +209,7 @@
         searchHidden.value = searchInput.value;
     }
     });
+    }
 
     // Handle "Edit" buttons
     

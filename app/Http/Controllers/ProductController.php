@@ -14,10 +14,12 @@ class ProductController extends Controller
     {
         $query = Product::query();
         $role = strtolower(auth()->user()->role ?? '');
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+        $effectiveRole = $isSpecialUser ? 'farmaceiti' : $role;
 
-        if ($role === 'kruzes') {
+        if ($effectiveRole === 'kruzes') {
             $query->where('hide_from_kruzes', false);
-        } elseif ($role === 'farmaceiti') {
+        } elseif ($effectiveRole === 'farmaceiti') {
             $query->where('hide_from_farmaceiti', false);
         }
         if ($search = $request->input('search')) {
@@ -35,7 +37,7 @@ class ProductController extends Controller
         // Role-based ordering:
         // - farmaceiti: sort by SNN
         // - others: sort by nosaukums (current default)
-        if ($role === 'farmaceiti') {
+        if ($effectiveRole === 'farmaceiti') {
             $products = $query->orderBy('snn')->paginate(50)->appends($request->query());
         } else {
             $products = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
@@ -66,6 +68,11 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $role = $this->role();
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+
+        if ($isSpecialUser) {
+            abort(403);
+        }
 
         $rules = [
             'nosaukums' => 'required|string|max:255',
@@ -133,6 +140,11 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $role = $this->role();
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+
+        if ($isSpecialUser) {
+            abort(403);
+        }
 
         $rules = [
             'nosaukums' => 'required|string|max:255',
@@ -181,6 +193,11 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
+        $isSpecialUser = strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
+        if ($isSpecialUser) {
+            abort(403);
+        }
+
         $product = Product::findOrFail($id);
         $product->delete();
 
