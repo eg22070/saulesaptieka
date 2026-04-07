@@ -11,6 +11,18 @@ use Carbon\Carbon;
 
 class RequestController extends Controller
 {
+    protected function artikuliForCurrentUser()
+    {
+        $query = Product::query();
+        $role = strtolower(auth()->user()->role ?? '');
+
+        if ($role === 'kruzes') {
+            $query->where('hide_from_kruzes', false);
+        }
+
+        return $query->get();
+    }
+
     public function index(Request $request)
     {
         if (auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti') {
@@ -83,7 +95,7 @@ class RequestController extends Controller
                 // ignore parse errors
             }
         }
-        $artikuli = Product::all();
+        $artikuli = $this->artikuliForCurrentUser();
         // Fetch all aptiekas for dropdowns
 
         $sort      = $request->input('sort', 'created_at');      // default sort field
@@ -115,7 +127,7 @@ class RequestController extends Controller
     public function create()
     {
         $aptiekas = Pharmacy::all();
-        $artikuli = Product::all();
+        $artikuli = $this->artikuliForCurrentUser();
 
         return view('pieprasijumi.create', compact('aptiekas', 'artikuli'));
     }
@@ -135,6 +147,15 @@ class RequestController extends Controller
             'cito' => 'nullable|boolean',
         ]);
 
+        if (strtolower(auth()->user()->role ?? '') === 'kruzes') {
+            $isHiddenFromKruzes = Product::whereKey($validated['artikula_id'])
+                ->where('hide_from_kruzes', true)
+                ->exists();
+            if ($isHiddenFromKruzes) {
+                return redirect()->back()->withErrors(['artikula_id' => 'Šis artikuls nav pieejams jūsu lietotājam.'])->withInput();
+            }
+        }
+
         Requests::create($validated);
 
         return redirect()->back()->with('success', 'Pieprasījums veiksmīgi pievienots');
@@ -150,7 +171,7 @@ class RequestController extends Controller
     {
         $requestItem = Requests::findOrFail($id);
         $aptiekas = Pharmacy::all();
-        $artikuli = Product::all();
+        $artikuli = $this->artikuliForCurrentUser();
         return view('pieprasijumi.edit', compact('requestItem', 'aptiekas', 'artikuli'));
     }
 
@@ -175,6 +196,14 @@ class RequestController extends Controller
         ]);
 
         $validated['cito'] = $request->has('cito');
+        if (strtolower(auth()->user()->role ?? '') === 'kruzes') {
+            $isHiddenFromKruzes = Product::whereKey($validated['artikula_id'])
+                ->where('hide_from_kruzes', true)
+                ->exists();
+            if ($isHiddenFromKruzes) {
+                return redirect()->back()->withErrors(['artikula_id' => 'Šis artikuls nav pieejams jūsu lietotājam.'])->withInput();
+            }
+        }
         // Logic for completion (keep this as is)
         $isCompleted = $request->has('completed') && $request->completed == '1';
         $oldArtikulaId = $requestItem->artikula_id;
