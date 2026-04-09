@@ -24,7 +24,7 @@ class PasutijumiController extends Controller
             $direction = 'desc';
         }
 
-        $query = Pasutijums::with('product')->orderBy($sort, $direction);
+        $query = Pasutijums::with(['product', 'creator', 'completer', 'canceller'])->orderBy($sort, $direction);
 
         // Hidden-from-everyone orders are visible only to the special user.
         if (!$isSpecialUser) {
@@ -133,11 +133,16 @@ class PasutijumiController extends Controller
         $data['created_by'] = auth()->id();
         $data['who_completed'] = null;
         $data['completed_at']  = null;
+        $data['who_cancelled'] = null;
+        $data['cancelled_at']  = null;
 
         // new record already created as completed
         if ($data['statuss'] === 'izpildits') {
             $data['who_completed'] = auth()->id();
             $data['completed_at']  = now();
+        } elseif ($data['statuss'] === 'atcelts') {
+            $data['who_cancelled'] = auth()->id();
+            $data['cancelled_at']  = now();
         }
 
         Pasutijums::create($data);
@@ -193,9 +198,12 @@ class PasutijumiController extends Controller
         }
 
         $wasCompleted = (bool) $pasutijumi->completed;
+        $wasCancelled = ($pasutijumi->statuss === 'atcelts');
 
         $data['who_completed'] = $pasutijumi->who_completed;
         $data['completed_at']  = $pasutijumi->completed_at;
+        $data['who_cancelled'] = $pasutijumi->who_cancelled;
+        $data['cancelled_at']  = $pasutijumi->cancelled_at;
 
         // if status changed to izpildits and it was not completed before
         if ($data['statuss'] === 'izpildits' && !$wasCompleted) {
@@ -207,6 +215,18 @@ class PasutijumiController extends Controller
         if ($data['statuss'] !== 'izpildits') {
             $data['who_completed'] = null;
             $data['completed_at']  = null;
+        }
+
+        // if status changed to atcelts and it was not cancelled before
+        if ($data['statuss'] === 'atcelts' && !$wasCancelled) {
+            $data['who_cancelled'] = auth()->id();
+            $data['cancelled_at']  = now();
+        }
+
+        // if status is not atcelts anymore, reset cancelled info
+        if ($data['statuss'] !== 'atcelts') {
+            $data['who_cancelled'] = null;
+            $data['cancelled_at']  = null;
         }
 
         $pasutijumi->update($data);

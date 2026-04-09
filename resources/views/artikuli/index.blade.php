@@ -92,7 +92,7 @@
             </div>
             <div class="mb-3">
                 <label for="analogs" class="form-label">Analogs</label>
-                <input type="text" class="form-control" id="analogs" name="analogs">
+                <textarea class="form-control" id="analogs" name="analogs" rows="2"></textarea>
             </div>
             <div class="mb-3">
                 <label for="atzimes" class="form-label">Īpašās atzīmes</label>

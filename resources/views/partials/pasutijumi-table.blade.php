@@ -148,6 +148,17 @@
                             @else
                                 -
                             @endif
+                            @if(auth()->check() && strtolower(auth()->user()->role) === 'brivibas')
+                                <br><strong>Atcēla:</strong>
+                                @if($p->statuss === 'atcelts' && $p->canceller)
+                                    {{ $p->canceller->name }}
+                                    @if($p->cancelled_at)
+                                        ({{ $p->cancelled_at->format('d/m/Y') }})
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            @endif
                         </div>
                     </td>
                 </tr>

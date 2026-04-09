@@ -98,9 +98,9 @@
                         <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">
                             <b>{{ $artikuls->nosaukums }}</b>
                         </td>
-                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->info }}</td>
-                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->pielietojums }}</td>
-                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->atzimes }}</td>
+                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{!! nl2br(e($artikuls->info)) !!}</td>
+                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{!! nl2br(e($artikuls->pielietojums)) !!}</td>
+                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{!! nl2br(e($artikuls->atzimes)) !!}</td>
                     @else
                         <td class="{{ $effectiveRole === 'brivibas' ? 'toggle-details' : '' }}"
                             style="border:1px solid #080000ff; padding:4px; cursor: {{ $effectiveRole === 'brivibas' ? 'pointer' : 'default' }};"
@@ -112,8 +112,8 @@
                         <td class="snn-cell" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">
                             {!! nl2br(e($artikuls->snn)) !!}
                         </td>
-                        <td style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->analogs }}</td>
-                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{{ $artikuls->atzimes }}</td>
+                        <td style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{!! nl2br(e($artikuls->analogs)) !!}</td>
+                        <td class="ipasas" style="border: 1px solid #080000ff; padding: 4px; vertical-align: middle;">{!! nl2br(e($artikuls->atzimes)) !!}</td>
                         <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
                              @if($effectiveRole !== 'farmaceiti')
                                 <button class="btn btn-sm btn-primary edit-artikuls-btn" 
@@ -171,8 +171,8 @@
                                     "
                                 ></span>
                                 <br>
-                                <strong>Info:</strong> {{ $artikuls->info ?: '-' }}<br>
-                                <strong>Pielietojums:</strong> {{ $artikuls->pielietojums ?: '-' }}<br>
+                                <strong>Info:</strong>{!! nl2br(e($artikuls->info ?: '-')) !!}<br>
+                                <strong>Pielietojums:</strong> {!! nl2br(e($artikuls->pielietojums ?: '-')) !!}<br>
                                 <strong>Paslēpts no Krūzes ielas:</strong> {{ $artikuls->hide_from_kruzes ? 'Jā' : 'Nē' }}<br>
                                 <strong>Paslēpts no farmaceitiem:</strong> {{ $artikuls->hide_from_farmaceiti ? 'Jā' : 'Nē' }}
                             </div>

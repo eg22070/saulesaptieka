@@ -25,13 +25,16 @@ class Pasutijums extends Model
         'statuss',
         'hide_from_visiem',
         'who_completed',
+        'who_cancelled',
         'completed_at',
+        'cancelled_at',
     ];
 
     protected $casts = [
         'datums' => 'date',
         'pasutijuma_datums' => 'date',
         'completed_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     public function product()
@@ -46,5 +49,9 @@ class Pasutijums extends Model
     public function creator()
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+    public function canceller()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'who_cancelled');
     }
 }
