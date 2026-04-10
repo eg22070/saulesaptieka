@@ -13,9 +13,12 @@
                     $isDateSort  = ($currentSort === 'datums');
                     $nextDir     = $isDateSort && $currentDir === 'asc' ? 'desc' : 'asc';
 
+                    $tableDefaultSf = auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti'
+                        ? 'neapstradats'
+                        : 'neizpildits';
                     $query = [
                         'search'        => request('search'),
-                        'status_filter' => request('status_filter', request('status_filter', 'neizpildits')),
+                        'status_filter' => request('status_filter', $tableDefaultSf),
                         'mine_filter'   => request('mine_filter', 'all'),
                         'date_from'     => request('date_from'),
                         'date_to'       => request('date_to'),
@@ -58,13 +61,17 @@
                 @php
                     $isSpecialUser = auth()->check() && strtolower(auth()->user()->email ?? '') === 'd.grazule@saulesaptieka.lv';
                     $canManageThisOrder = !$isSpecialUser || ((int) $p->created_by === (int) auth()->id());
+                    $isBrivibas = auth()->check() && strtolower(auth()->user()->role ?? '') === 'brivibas';
+                    $zaluFromCatalog = $p->artikula_id && ($p->product || isset($artikuliMap[$p->artikula_id]));
+                    $zaluFreeOnly = ! $zaluFromCatalog && (bool) strlen(trim((string) ($p->farmaceita_nosaukums ?? '')));
                 @endphp
                 @php
                     $s = strtolower($p->statuss ?? 'neizpildits');
                     $statusLabels = [
-                        'izpildits'   => 'izpildīts',
-                        'neizpildits' => 'neizpildīts',
-                        'atcelts'     => 'atcelts',
+                        'izpildits'     => 'izpildīts',
+                        'neizpildits'   => 'neizpildīts',
+                        'neapstradats'  => 'neapstrādāts',
+                        'atcelts'       => 'atcelts',
                     ];
                     $displayStatus = $statusLabels[$s] ?? $s;
                 @endphp
@@ -74,11 +81,21 @@
                             {{ $displayStatus }}
                         </span>
                     </td>
-                    <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->datums?->format('d/m/Y') }}</td>
+                    <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->datums ? $p->datums->format('d/m/Y') : '—' }}</td>
                     <td class="toggle-details"
                         style="border: 1px solid #080000ff; padding: 4px; cursor:pointer;"
                         title="Klikšķiniet, lai redzētu detaļas">
-                        <b>{{ $p->product?->nosaukums ?? ($artikuliMap[$p->artikula_id]->nosaukums ?? '-') }}</b>
+                        @if($zaluFromCatalog)
+                            <b>{{ $p->product?->nosaukums ?? ($artikuliMap[$p->artikula_id]->nosaukums ?? '—') }}</b>
+                        @elseif($zaluFreeOnly)
+                            @if($isBrivibas)
+                                {{ $p->farmaceita_nosaukums }}
+                            @else
+                                <b>{{ $p->farmaceita_nosaukums }}</b>
+                            @endif
+                        @else
+                            —
+                        @endif
                     </td>
                     <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">
                         {{ $skaitsDisplay }}
@@ -90,13 +107,15 @@
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->vards_uzvards }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px;">{{ $p->talrunis_epasts }}</td>
                     <td style="border: 1px solid #080000ff; padding: 4px; text-align:center;">{{ optional($p->pasutijuma_datums)->format('d/m/Y') }}</td>
-                    <td style="border: 1px solid #080000ff; padding: 4px;">
+                    
                     @if(auth()->check() && strtolower(auth()->user()->role) !== 'farmaceiti' && $canManageThisOrder)
+                    <td style="border: 1px solid #080000ff; padding: 4px;">    
                         <button type="button" class="btn btn-sm btn-primary edit-btn"
                                 data-id="{{ $p->id }}"
                                 data-datums="{{ optional($p->datums)->format('d/m/Y') }}"
-                                data-artikula_name="{{ $p->product?->nosaukums ?? ($artikuliMap[$p->artikula_id]->nosaukums ?? '') }}"
-                                data-artikula_id="{{ $p->artikula_id }}"
+                                data-artikula-id="{{ $p->artikula_id ?? '' }}"
+                                data-artikula-label="{{ e($p->product?->nosaukums ?? ($artikuliMap[$p->artikula_id]->nosaukums ?? '')) }}"
+                                data-farmaceita-nosaukums="{{ e($p->farmaceita_nosaukums ?? '') }}"
                                 data-skaits="{{ $p->skaits }}"
                                 data-pasutijuma_numurs="{{ e($p->pasutijuma_numurs) }}"
                                 data-receptes_numurs="{{ e($p->receptes_numurs) }}"
@@ -193,7 +212,8 @@
     border: 1px solid transparent;
     text-transform: none;
 }
-.badge-status-neizpildits {
+.badge-status-neizpildits,
+.badge-status-neapstradats {
     background: #dddcdc;
     color: #412f1e;
     border:1px solid #412f1e;
@@ -210,13 +230,15 @@
 }
 
 /* Row background colors by status only (no alternating rows) */
-.request-row.status-neizpildits { background-color: #f1eae3 !important; }
+.request-row.status-neizpildits,
+.request-row.status-neapstradats { background-color: #f1eae3 !important; }
 .request-row.status-izpildits   { background-color: #a6c2a2 !important; }
 .request-row.status-atcelts     { background-color: #e9a58d !important; }
 
 /* Hover behavior: use same color at 50% opacity */
 /* neizpildits */
-.request-row.status-neizpildits:hover {
+.request-row.status-neizpildits:hover,
+.request-row.status-neapstradats:hover {
     background-color: rgba(241,234,227,0.5) !important;
 }
 

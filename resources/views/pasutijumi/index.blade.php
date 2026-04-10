@@ -33,12 +33,16 @@
                 <div class="mt-2 d-flex align-items-center">
                     <label class="me-2" style="margin-right:12px;">Statuss:</label>
                     @php
-                        $currentStatusFilter = request('status_filter', 'neizpildits');
+                        $defaultStatusFilter = auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti'
+                            ? 'neapstradats'
+                            : 'neizpildits';
+                        $currentStatusFilter = request('status_filter', $defaultStatusFilter);
                     @endphp
-                    <select id="pas_status_filter" name="status_filter" class="form-select form-select-sm" style="width:180px; margin-right:12px;">
-                        <option value="all"         {{ $currentStatusFilter === 'all'         ? 'selected' : '' }}>Visi</option>
-                        <option value="neizpildits" {{ $currentStatusFilter === 'neizpildits' ? 'selected' : '' }}>Neizpildītie</option>
-                        <option value="done"        {{ $currentStatusFilter === 'done'        ? 'selected' : '' }}>Izpildītie &amp; Atceltie</option>
+                    <select id="pas_status_filter" name="status_filter" class="form-select form-select-sm" style="width:220px; margin-right:12px;">
+                        <option value="all"           {{ $currentStatusFilter === 'all'           ? 'selected' : '' }}>Visi</option>
+                        <option value="neizpildits"   {{ $currentStatusFilter === 'neizpildits'   ? 'selected' : '' }}>Neizpildītie</option>
+                        <option value="neapstradats"  {{ $currentStatusFilter === 'neapstradats'  ? 'selected' : '' }}>Neapstrādātie</option>
+                        <option value="done"          {{ $currentStatusFilter === 'done'          ? 'selected' : '' }}>Izpildītie &amp; Atceltie</option>
                     </select>
 
                     <label class="me-2" style="margin-right:12px;">Datumu filtra diapazons:</label>
@@ -54,7 +58,7 @@
                             <option value="mine" {{ request('mine_filter') === 'mine' ? 'selected' : '' }}>Dina</option>
                         </select>
                     @endif
-                    <a href="{{ route('pasutijumi.index', ['status_filter' => 'neizpildits']) }}" class="btn btn-sm btn-outline-secondary ms-2">
+                    <a href="{{ route('pasutijumi.index', ['status_filter' => $defaultStatusFilter]) }}" class="btn btn-sm btn-outline-secondary ms-2">
                         Atiestatīt
                     </a>
                 </div>
@@ -65,6 +69,12 @@
                     <button class="btn btn-primary" id="openCreateModal">Pievienot Pasūtījumu</button>
                 </div>
             </div>
+            @elseif(auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti')
+            <div class="d-flex justify-content-between mb-3">
+                <div>
+                    <button type="button" class="btn btn-primary" id="openKvitsModal">Jauna kvīts</button>
+                </div>
+            </div>
             @endif
             <div id="searchResults">
                 @include('partials.pasutijumi-table', ['pasutijumi' => $pasutijumi, 'artikuli' => $artikuli])
@@ -73,6 +83,9 @@
     </div>
 
     @include('partials.pasutijumi-modal')
+    @if(auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti')
+        @include('partials.pasutijumi-kvits-modal')
+    @endif
 
     <script>
     const defaultPreviousFriday = "{{ \Carbon\Carbon::now()->subWeek()->startOfWeek()->addDays(4)->format('d/m/Y') }}";
@@ -108,7 +121,7 @@
             debounce = setTimeout(() => {
                 const params = new URLSearchParams({
                     search: this.value,
-                    status_filter: document.getElementById('pas_status_filter')?.value || 'neizpildits',
+                    status_filter: document.getElementById('pas_status_filter')?.value || '{{ $defaultStatusFilter }}',
                     date_from: document.getElementById('pas_date_from').value || '',
                     date_to: document.getElementById('pas_date_to').value || '',
                     mine_filter: document.getElementById('pas_mine_filter')?.value || 'all',
@@ -134,7 +147,57 @@
         });
 
         bindPasutijumiModalHandlers();
+        bindKvitsModalHandlers();
     });
+
+    function bindKvitsModalHandlers() {
+        const modalEl = document.getElementById('pasutijumiKvitsModal');
+        if (!modalEl) return;
+
+        const modal = new bootstrap.Modal(modalEl);
+        const form = document.getElementById('pasutijumiKvitsForm');
+        const nameInput = document.getElementById('kv_artikula_name');
+        const idInput = document.getElementById('kv_artikula_id');
+        const datalist = document.getElementById('kv_artikuli');
+        const talInput = document.getElementById('kv_talrunis');
+
+        /** Sync HTML5 constraint validation (same native bubble as “Please fill out this field”). */
+        function syncKvitsTalrunisConstraint() {
+            if (!talInput) return;
+            const n = String(talInput.value || '').replace(/\D/g, '').length;
+            if (n >= 1 && n < 8) {
+                talInput.setCustomValidity('Lūdzu, ievadiet vismaz 8 ciparus.');
+            } else {
+                talInput.setCustomValidity('');
+            }
+        }
+
+        talInput?.addEventListener('input', syncKvitsTalrunisConstraint);
+        talInput?.addEventListener('blur', syncKvitsTalrunisConstraint);
+
+        if (nameInput && datalist && idInput) {
+            nameInput.addEventListener('input', function () {
+                const value = this.value;
+                let found = false;
+                Array.from(datalist.options).forEach(opt => {
+                    if (opt.value === value) {
+                        idInput.value = opt.dataset.id || opt.getAttribute('data-id') || '';
+                        found = true;
+                    }
+                });
+                if (!found) idInput.value = '';
+            });
+        }
+
+        document.getElementById('openKvitsModal')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            form?.reset();
+            if (idInput) idInput.value = '';
+            if (nameInput) nameInput.value = '';
+            syncKvitsTalrunisConstraint();
+            modal.show();
+        });
+    }
 
     function bindPasutijumiModalHandlers() {
         const modalEl = document.getElementById('pasutijumiModal');
@@ -156,19 +219,47 @@
         const m_hide_from_visiem = document.getElementById('m_hide_from_visiem');
         const m_complete_btn = document.getElementById('m_complete_btn');
         const datalist = document.getElementById('m_artikuli');
+        const m_zalu_free_row = document.getElementById('m_zalu_free_row');
+        const m_farmaceita_nosaukums = document.getElementById('m_farmaceita_nosaukums');
+
+        function setPasutijumiZaluCatalogOnly() {
+            if (m_zalu_free_row) m_zalu_free_row.style.display = 'none';
+            if (m_farmaceita_nosaukums) {
+                m_farmaceita_nosaukums.disabled = true;
+                m_farmaceita_nosaukums.removeAttribute('required');
+                m_farmaceita_nosaukums.value = '';
+            }
+            if (m_artikula_name) m_artikula_name.setAttribute('required', 'required');
+        }
+
+        function setPasutijumiZaluFreeWithCatalogPick() {
+            if (m_zalu_free_row) m_zalu_free_row.style.display = 'block';
+            if (m_farmaceita_nosaukums) {
+                m_farmaceita_nosaukums.disabled = false;
+                m_farmaceita_nosaukums.setAttribute('required', 'required');
+            }
+            if (m_artikula_name) m_artikula_name.removeAttribute('required');
+        }
+
+        function syncPasutijumiArtikulaFromDatalist() {
+            if (!m_artikula_name || !datalist || !m_artikula_id) return;
+            const value = m_artikula_name.value;
+            let foundId = '';
+            Array.from(datalist.options).forEach(opt => {
+                if (opt.value === value) {
+                    foundId = opt.dataset.id || opt.getAttribute('data-id') || '';
+                }
+            });
+            m_artikula_id.value = foundId;
+            const freeVisible = m_zalu_free_row && m_zalu_free_row.style.display !== 'none';
+            if (freeVisible && foundId) {
+                setPasutijumiZaluCatalogOnly();
+                if (m_farmaceita_nosaukums) m_farmaceita_nosaukums.value = '';
+            }
+        }
 
         if (m_artikula_name && datalist) {
-            m_artikula_name.addEventListener('input', function () {
-                const value = this.value;
-                let found = false;
-                Array.from(datalist.options).forEach(opt => {
-                    if (opt.value === value) {
-                        m_artikula_id.value = opt.dataset.id || opt.getAttribute('data-id') || '';
-                        found = true;
-                    }
-                });
-                if (!found) m_artikula_id.value = '';
-            });
+            m_artikula_name.addEventListener('input', syncPasutijumiArtikulaFromDatalist);
         }
 
         document.addEventListener('click', function (e) {
@@ -180,6 +271,7 @@
 
                 if (m_artikula_id) m_artikula_id.value = '';
                 if (m_artikula_name) m_artikula_name.value = '';
+                setPasutijumiZaluCatalogOnly();
 
                 // set default previous Friday for Pieprasījuma datums
                 if (m_datums) m_datums.value = defaultPreviousFriday;
@@ -199,8 +291,22 @@
                 if (methodInput) methodInput.value = 'PUT';
                 form.action = "{{ url('pasutijumi') }}/" + d.id;
                 if (m_datums) m_datums.value = d.datums || '';
-                if (m_artikula_name) m_artikula_name.value = d.artikula_name || '';
-                if (m_artikula_id) m_artikula_id.value = d.artikula_id || '';
+                const artikulaIdRaw = this.getAttribute('data-artikula-id');
+                const hasArtikulaId = artikulaIdRaw !== null && artikulaIdRaw !== '';
+                if (hasArtikulaId) {
+                    setPasutijumiZaluCatalogOnly();
+                    if (m_artikula_id) m_artikula_id.value = artikulaIdRaw;
+                    if (m_artikula_name) {
+                        m_artikula_name.value = this.getAttribute('data-artikula-label') || '';
+                    }
+                } else {
+                    setPasutijumiZaluFreeWithCatalogPick();
+                    if (m_artikula_id) m_artikula_id.value = '';
+                    if (m_artikula_name) m_artikula_name.value = '';
+                    if (m_farmaceita_nosaukums) {
+                        m_farmaceita_nosaukums.value = this.getAttribute('data-farmaceita-nosaukums') || '';
+                    }
+                }
                 if (m_skaits) m_skaits.value = d.skaits || 1;
                 if (m_pasutijuma_numurs) m_pasutijuma_numurs.value = d.pasutijuma_numurs || '';
                 if (m_receptes_numurs) m_receptes_numurs.value = d.receptes_numurs || '';
@@ -213,9 +319,10 @@
                     const currentStatus = (d.statuss || 'neizpildits').toLowerCase();
                     m_statuss.value = currentStatus;
 
-                    // Show "Izpildīt" only if current status is neizpildits
+                    // Show "Izpildīt" for neizpildīti un neapstrādāti
                     if (m_complete_btn) {
-                        m_complete_btn.style.display = currentStatus === 'neizpildits' ? '' : 'none';
+                        const canComplete = currentStatus === 'neizpildits' || currentStatus === 'neapstradats';
+                        m_complete_btn.style.display = canComplete ? '' : 'none';
                     }
                 }
 
@@ -223,7 +330,8 @@
                 if (m_statuss && m_complete_btn) {
                     m_statuss.onchange = function () {
                         const val = (this.value || '').toLowerCase();
-                        m_complete_btn.style.display = val === 'neizpildits' ? '' : 'none';
+                        const canComplete = val === 'neizpildits' || val === 'neapstradats';
+                        m_complete_btn.style.display = canComplete ? '' : 'none';
                     };
                 }
 

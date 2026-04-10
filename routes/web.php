@@ -37,6 +37,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->middleware('block_special_user')->name('users.destroy');
 });
 
+Route::post('pasutijumi/kvits', [PasutijumiController::class, 'storeKvits'])
+    ->middleware('auth')
+    ->name('pasutijumi.kvits');
 Route::resource('pasutijumi', PasutijumiController::class)->middleware('auth');
 Route::resource('artikuli', ProductController::class)->middleware('auth');
 Route::get('/pieprasijumi/bulk-complete', [RequestController::class, 'bulkComplete'])

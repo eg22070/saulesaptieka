@@ -24,18 +24,25 @@
                         <input type="text" id="m_datums" name="datums"
                             class="form-control"
                             style="width:160px;"
-                            placeholder="DD/MM/YYYY" required>
+                            placeholder="DD/MM/YYYY">
                     </div>
 
-                    <div class="mb-2 d-flex align-items-center">
-                        <label class="me-3" style="width:130px;">Zāļu nosaukums</label>
-                        <input id="m_artikula_name" type="text" class="form-control" list="m_artikuli" placeholder="Rakstiet artikula nosaukumu" style="flex:1;" required>
-                        <input type="hidden" id="m_artikula_id" name="artikula_id">
+                    <div id="m_zalu_catalog_row" class="mb-2 d-flex align-items-center">
+                        <label class="me-3" style="width:130px;">Zāļu nosaukums (katalogs)</label>
+                        <input id="m_artikula_name" type="text" class="form-control" list="m_artikuli" placeholder="Rakstiet artikula nosaukumu" style="flex:1;">
+                        <input type="hidden" id="m_artikula_id" name="artikula_id" value="">
                         <datalist id="m_artikuli">
                             @foreach($artikuli as $a)
                                 <option value="{{ $a->nosaukums }}" data-id="{{ $a->id }}"></option>
                             @endforeach
                         </datalist>
+                    </div>
+                    <div id="m_zalu_free_row" class="mb-2" style="display:none;">
+                        <div class="d-flex align-items-center">
+                            <label class="me-3" style="width:130px;">Zāļu nosaukums (brīvā forma)</label>
+                            <input type="text" id="m_farmaceita_nosaukums" name="farmaceita_nosaukums" class="form-control" style="flex:1;">
+                        </div>
+                        <p class="text-muted small mb-0 mt-1" style="margin-left:143px;">Ja izvēlaties artikulu augšā, šis lauks netiek izmantots.</p>
                     </div>
 
                     <div class="mb-2 d-flex align-items-center">
@@ -82,6 +89,7 @@
                         <label class="me-3" style="width:130px;">Statuss</label>
                         <select id="m_statuss" name="statuss" class="form-control" style="width:200px;">
                             <option value="neizpildits">NeizpildĪts</option>
+                            <option value="neapstradats">Neapstrādāts</option>
                             <option value="izpildits">IzpildĪts</option>
                             <option value="atcelts">Atcelts</option>
                         </select>

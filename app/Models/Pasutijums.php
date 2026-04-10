@@ -15,6 +15,7 @@ class Pasutijums extends Model
         'created_by',
         'datums',
         'artikula_id',
+        'farmaceita_nosaukums',
         'skaits',
         'pasutijuma_numurs',
         'receptes_numurs',
