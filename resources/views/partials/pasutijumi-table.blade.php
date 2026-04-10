@@ -13,9 +13,7 @@
                     $isDateSort  = ($currentSort === 'datums');
                     $nextDir     = $isDateSort && $currentDir === 'asc' ? 'desc' : 'asc';
 
-                    $tableDefaultSf = auth()->check() && strtolower(auth()->user()->role) === 'farmaceiti'
-                        ? 'neapstradats'
-                        : 'neizpildits';
+                    $tableDefaultSf = 'neizpildits';
                     $query = [
                         'search'        => request('search'),
                         'status_filter' => request('status_filter', $tableDefaultSf),

@@ -64,16 +64,11 @@ class PasutijumiController extends Controller
             });
         }
 
-        // status_filter: neizpildits | neapstradats | done | all
-        $defaultStatusFilter = strtolower(auth()->user()->role ?? '') === 'farmaceiti'
-            ? 'neapstradats'
-            : 'neizpildits';
-        $statusFilter = $request->query('status_filter', $defaultStatusFilter);
+        // status_filter: neizpildits | done | all
+        $statusFilter = $request->query('status_filter', 'neizpildits');
 
         if ($statusFilter === 'neizpildits') {
             $query->where('statuss', 'neizpildits');
-        } elseif ($statusFilter === 'neapstradats') {
-            $query->where('statuss', 'neapstradats');
         } elseif ($statusFilter === 'done') {
             // Izpildītie & Atceltie
             $query->whereIn('statuss', ['izpildits', 'atcelts']);
@@ -271,7 +266,7 @@ class PasutijumiController extends Controller
 
         $returnUrl = $request->input(
             'return_url',
-            route('pasutijumi.index', ['status_filter' => 'neapstradats'])
+            route('pasutijumi.index', ['status_filter' => 'neizpildits'])
         );
 
         return redirect()
