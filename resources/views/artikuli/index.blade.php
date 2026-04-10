@@ -130,6 +130,16 @@
                     <input type="checkbox" id="hide_from_farmaceiti" name="hide_from_farmaceiti" value="1" class="form-check-input">
                     <label for="hide_from_farmaceiti" class="form-check-label">Slēpt no farmaceitiem</label>
                 </div>
+                <input type="hidden" name="without_arst" value="0">
+                <div class="mb-2 form-check">
+                    <input type="checkbox" id="without_arst" name="without_arst" value="1" class="form-check-input">
+                    <label for="without_arst" class="form-check-label">Bez ārstnieciskām iestādēm</label>
+                </div>
+                <input type="hidden" name="nemedikamenti" value="0">
+                <div class="mb-2 form-check">
+                    <input type="checkbox" id="nemedikamenti" name="nemedikamenti" value="1" class="form-check-input">
+                    <label for="nemedikamenti" class="form-check-label">Ne medikamenti</label>
+                </div>
             @endif
         </div>
 
@@ -202,8 +212,12 @@
 
       const chkHideKruzes = document.getElementById('hide_from_kruzes');
       const chkHideFarm   = document.getElementById('hide_from_farmaceiti');
+      const chkWithoutArst = document.getElementById('without_arst');
+      const chkNemedikamenti = document.getElementById('nemedikamenti');
       if (chkHideKruzes) chkHideKruzes.checked = false;
       if (chkHideFarm)   chkHideFarm.checked   = false;
+      if (chkWithoutArst) chkWithoutArst.checked = false;
+      if (chkNemedikamenti) chkNemedikamenti.checked = false;
 
       if (searchHidden && searchInput) {
         searchHidden.value = searchInput.value;
@@ -228,6 +242,8 @@
 
         const hideFromKruzes     = btn.dataset.hide_from_kruzes;
         const hideFromFarmaceiti = btn.dataset.hide_from_farmaceiti;
+        const withoutArst = btn.dataset.without_arst;
+        const nemedikamenti = btn.dataset.nemedikamenti;
 
         form.action = "/artikuli/" + id;
 
@@ -265,12 +281,20 @@
         // set checkboxes if present
         const chkHideKruzes = document.getElementById('hide_from_kruzes');
         const chkHideFarm   = document.getElementById('hide_from_farmaceiti');
+        const chkWithoutArst = document.getElementById('without_arst');
+        const chkNemedikamenti = document.getElementById('nemedikamenti');
 
         if (chkHideKruzes) {
             chkHideKruzes.checked = (hideFromKruzes === '1' || hideFromKruzes === 1);
         }
         if (chkHideFarm) {
             chkHideFarm.checked = (hideFromFarmaceiti === '1' || hideFromFarmaceiti === 1);
+        }
+        if (chkWithoutArst) {
+            chkWithoutArst.checked = (withoutArst === '1' || withoutArst === 1);
+        }
+        if (chkNemedikamenti) {
+            chkNemedikamenti.checked = (nemedikamenti === '1' || nemedikamenti === 1);
         }
         // Set modal title and button
         modalTitle.textContent = 'Labot artikulu';

@@ -91,6 +91,8 @@ class ProductController extends Controller
                     'pielietojums' => 'nullable|string',
                     'hide_from_kruzes' => 'boolean',
                     'hide_from_farmaceiti' => 'boolean',
+                    'without_arst' => 'boolean',
+                    'nemedikamenti' => 'boolean',
                 ]);
             }
         
@@ -98,6 +100,8 @@ class ProductController extends Controller
         // normalize checkboxes
         $data['hide_from_kruzes'] = $request->boolean('hide_from_kruzes');
         $data['hide_from_farmaceiti'] = $request->boolean('hide_from_farmaceiti');
+        $data['without_arst'] = $request->boolean('without_arst');
+        $data['nemedikamenti'] = $request->boolean('nemedikamenti');
         // Default validity to 1 gads when not provided.
         if ($role === 'brivibas') {
             $data['atk_validity_days'] = $data['atk_validity_days'] ?? 90;
@@ -105,7 +109,7 @@ class ProductController extends Controller
         
         if ($role === 'kruzes') {
             // ignore hidden/extra fields
-            unset($data['atk'], $data['info'], $data['pielietojums'], $data['hide_from_kruzes'], $data['hide_from_farmaceiti']);
+            unset($data['atk'], $data['info'], $data['pielietojums'], $data['hide_from_kruzes'], $data['hide_from_farmaceiti'], $data['without_arst'], $data['nemedikamenti']);
         } elseif ($role === 'farmaceiti') {
             // farmaceiti should not create/edit at all
             abort(403);
@@ -163,6 +167,8 @@ class ProductController extends Controller
                     'pielietojums' => 'nullable|string',
                     'hide_from_kruzes' => 'boolean',
                     'hide_from_farmaceiti' => 'boolean',
+                    'without_arst' => 'boolean',
+                    'nemedikamenti' => 'boolean',
                 ]);
             }
         
@@ -170,13 +176,15 @@ class ProductController extends Controller
         // normalize checkboxes
         $data['hide_from_kruzes'] = $request->boolean('hide_from_kruzes');
         $data['hide_from_farmaceiti'] = $request->boolean('hide_from_farmaceiti');
+        $data['without_arst'] = $request->boolean('without_arst');
+        $data['nemedikamenti'] = $request->boolean('nemedikamenti');
         if ($role === 'brivibas') {
             $data['atk_validity_days'] = $data['atk_validity_days'] ?? 90;
         }
         
         if ($role === 'kruzes') {
             // ignore hidden/extra fields
-            unset($data['atk'], $data['info'], $data['pielietojums'], $data['hide_from_kruzes'], $data['hide_from_farmaceiti']);
+            unset($data['atk'], $data['info'], $data['pielietojums'], $data['hide_from_kruzes'], $data['hide_from_farmaceiti'], $data['without_arst'], $data['nemedikamenti']);
         } elseif ($role === 'farmaceiti') {
             // farmaceiti should not create/edit at all
             abort(403);

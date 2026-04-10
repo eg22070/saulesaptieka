@@ -133,6 +133,8 @@
                                             data-pielietojums="{{ $artikuls->pielietojums }}"
                                             data-hide_from_farmaceiti="{{ $artikuls->hide_from_farmaceiti ? 1 : 0 }}"
                                             data-hide_from_kruzes="{{ $artikuls->hide_from_kruzes ? 1 : 0 }}"
+                                            data-without_arst="{{ $artikuls->without_arst ? 1 : 0 }}"
+                                            data-nemedikamenti="{{ $artikuls->nemedikamenti ? 1 : 0 }}"
                                         @endif
                                         data-bs-toggle="modal" data-bs-target="#artikuliModal">
                                 Labot</button>
@@ -174,7 +176,9 @@
                                 <strong>Info:</strong>{!! nl2br(e($artikuls->info ?: '-')) !!}<br>
                                 <strong>Pielietojums:</strong> {!! nl2br(e($artikuls->pielietojums ?: '-')) !!}<br>
                                 <strong>Paslēpts no Krūzes ielas:</strong> {{ $artikuls->hide_from_kruzes ? 'Jā' : 'Nē' }}<br>
-                                <strong>Paslēpts no farmaceitiem:</strong> {{ $artikuls->hide_from_farmaceiti ? 'Jā' : 'Nē' }}
+                                <strong>Paslēpts no farmaceitiem:</strong> {{ $artikuls->hide_from_farmaceiti ? 'Jā' : 'Nē' }}<br>
+                                <strong>Bez ārstnieciskām iestādēm:</strong> {{ $artikuls->without_arst ? 'Jā' : 'Nē' }}<br>
+                                <strong>Ne medikamenti:</strong> {{ $artikuls->nemedikamenti ? 'Jā' : 'Nē' }}
                             </div>
                         </td>
                     </tr>

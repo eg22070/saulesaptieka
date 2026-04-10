@@ -12,5 +12,7 @@ class Product extends Model
     'pielietojums',
     'atk_validity_days',
     'hide_from_kruzes',
-    'hide_from_farmaceiti',];
+    'hide_from_farmaceiti',
+    'without_arst',
+    'nemedikamenti',];
 }
