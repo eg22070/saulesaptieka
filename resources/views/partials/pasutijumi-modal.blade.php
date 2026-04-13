@@ -15,7 +15,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="search" value="{{ request('search') }}">
-                    <input type="hidden" name="status_filter" value="{{ request('status_filter', 'neizpildits') }}">
+                    <input type="hidden" name="status_filter" value="{{ request('status_filter', 'all') }}">
                     <input type="hidden" name="date_from" value="{{ request('date_from') }}">
                     <input type="hidden" name="date_to" value="{{ request('date_to') }}">
                     <!-- other fields (datums, artikuls, skaits, ...) -->

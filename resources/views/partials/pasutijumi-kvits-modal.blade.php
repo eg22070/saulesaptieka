@@ -5,7 +5,7 @@
                 @csrf
                 @php
                     $kvitsReturnParams = array_filter([
-                        'status_filter' => 'neizpildits',
+                        'status_filter' => 'all',
                         'search' => request('search'),
                         'date_from' => request('date_from'),
                         'date_to' => request('date_to'),

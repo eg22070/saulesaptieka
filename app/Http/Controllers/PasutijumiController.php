@@ -65,7 +65,7 @@ class PasutijumiController extends Controller
         }
 
         // status_filter: neizpildits | done | all
-        $statusFilter = $request->query('status_filter', 'neizpildits');
+        $statusFilter = $request->query('status_filter', 'all');
 
         if ($statusFilter === 'neizpildits') {
             $query->where('statuss', 'neizpildits');
@@ -75,7 +75,7 @@ class PasutijumiController extends Controller
         } elseif ($statusFilter === 'all') {
             // no filter
         } else {
-            $query->where('statuss', 'neizpildits');
+            $query->where('statuss', 'all');
         }
 
         // date range filter (dd/mm/YYYY expected)
@@ -172,7 +172,7 @@ class PasutijumiController extends Controller
 
         Pasutijums::create($data);
 
-        $returnUrl = $request->input('return_url', route('pasutijumi.index', ['status_filter' => 'neizpildits']));
+        $returnUrl = $request->input('return_url', route('pasutijumi.index', ['status_filter' => 'all']));
 
         return redirect()
             ->to($returnUrl)
@@ -266,7 +266,7 @@ class PasutijumiController extends Controller
 
         $returnUrl = $request->input(
             'return_url',
-            route('pasutijumi.index', ['status_filter' => 'neizpildits'])
+            route('pasutijumi.index', ['status_filter' => 'all'])
         );
 
         return redirect()
@@ -373,7 +373,7 @@ class PasutijumiController extends Controller
 
         $pasutijumi->update($data);
 
-        $returnUrl = $request->input('return_url', route('pasutijumi.index', ['status_filter' => 'neizpildits']));
+        $returnUrl = $request->input('return_url', route('pasutijumi.index', ['status_filter' => 'all']));
 
         return redirect()
             ->to($returnUrl)
@@ -400,9 +400,9 @@ class PasutijumiController extends Controller
             return redirect()->to($returnUrl)->with('success', 'Pasūtījums izdzēsts.');
         }
 
-        // Fallback – default filter "neizpildits"
+        // Fallback – default filter "all"
         return redirect()
-            ->route('pasutijumi.index', ['status_filter' => 'neizpildits'])
+            ->route('pasutijumi.index', ['status_filter' => 'all'])
             ->with('success', 'Pasūtījums izdzēsts.');
     }
 }

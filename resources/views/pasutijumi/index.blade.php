@@ -33,7 +33,7 @@
                 <div class="mt-2 d-flex align-items-center">
                     <label class="me-2" style="margin-right:12px;">Statuss:</label>
                     @php
-                        $currentStatusFilter = request('status_filter', 'neizpildits');
+                        $currentStatusFilter = request('status_filter', 'all');
                     @endphp
                     <select id="pas_status_filter" name="status_filter" class="form-select form-select-sm" style="width:220px; margin-right:12px;">
                         <option value="all"           {{ $currentStatusFilter === 'all'           ? 'selected' : '' }}>Visi</option>
@@ -54,7 +54,7 @@
                             <option value="mine" {{ request('mine_filter') === 'mine' ? 'selected' : '' }}>Dina</option>
                         </select>
                     @endif
-                    <a href="{{ route('pasutijumi.index', ['status_filter' => 'neizpildits']) }}" class="btn btn-sm btn-outline-secondary ms-2">
+                    <a href="{{ route('pasutijumi.index', ['status_filter' => 'all']) }}" class="btn btn-sm btn-outline-secondary ms-2">
                         Atiestatīt
                     </a>
                 </div>
@@ -117,7 +117,7 @@
             debounce = setTimeout(() => {
                 const params = new URLSearchParams({
                     search: this.value,
-                    status_filter: document.getElementById('pas_status_filter')?.value || 'neizpildits',
+                    status_filter: document.getElementById('pas_status_filter')?.value || 'all',
                     date_from: document.getElementById('pas_date_from').value || '',
                     date_to: document.getElementById('pas_date_to').value || '',
                     mine_filter: document.getElementById('pas_mine_filter')?.value || 'all',

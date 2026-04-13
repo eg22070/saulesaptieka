@@ -13,7 +13,7 @@
                     $isDateSort  = ($currentSort === 'datums');
                     $nextDir     = $isDateSort && $currentDir === 'asc' ? 'desc' : 'asc';
 
-                    $tableDefaultSf = 'neizpildits';
+                    $tableDefaultSf = 'all';
                     $query = [
                         'search'        => request('search'),
                         'status_filter' => request('status_filter', $tableDefaultSf),
