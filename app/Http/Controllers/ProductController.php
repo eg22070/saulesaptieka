@@ -38,7 +38,7 @@ class ProductController extends Controller
         // - farmaceiti: sort by SNN
         // - others: sort by nosaukums (current default)
         if ($effectiveRole === 'farmaceiti') {
-            $products = $query->orderBy('snn')->paginate(50)->appends($request->query());
+            $products = $query->orderBy('snn')->orderBy('nosaukums')->paginate(50)->appends($request->query());
         } else {
             $products = $query->orderBy('nosaukums')->paginate(50)->appends($request->query());
         }
