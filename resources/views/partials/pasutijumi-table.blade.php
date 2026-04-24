@@ -67,7 +67,7 @@
                     $s = strtolower($p->statuss ?? 'neizpildits');
                     $statusLabels = [
                         'izpildits'     => 'izpildīts',
-                        'neizpildits'   => 'neizpildīts',
+                        'neizpildits'   => 'pasūtīts',
                         'neapstradats'  => 'neapstrādāts',
                         'atcelts'       => 'atcelts',
                     ];
@@ -113,12 +113,16 @@
                                 data-datums="{{ optional($p->datums)->format('d/m/Y') }}"
                                 data-artikula-id="{{ $p->artikula_id ?? '' }}"
                                 data-artikula-label="{{ e($p->product?->nosaukums ?? ($artikuliMap[$p->artikula_id]->nosaukums ?? '')) }}"
+                                data-without-arst="{{ ($p->product?->without_arst ?? ($artikuliMap[$p->artikula_id]->without_arst ?? false)) ? 1 : 0 }}"
+                                data-nemedikamenti="{{ ($p->product?->nemedikamenti ?? ($artikuliMap[$p->artikula_id]->nemedikamenti ?? false)) ? 1 : 0 }}"
                                 data-farmaceita-nosaukums="{{ e($p->farmaceita_nosaukums ?? '') }}"
                                 data-skaits="{{ $p->skaits }}"
                                 data-pasutijuma_numurs="{{ e($p->pasutijuma_numurs) }}"
                                 data-receptes_numurs="{{ e($p->receptes_numurs) }}"
                                 data-vards_uzvards="{{ e($p->vards_uzvards) }}"
                                 data-talrunis_epasts="{{ e($p->talrunis_epasts) }}"
+                                data-arstniecibas_iestade="{{ e($p->arstniecibas_iestade) }}"
+                                data-arsts="{{ e($p->arsts) }}"
                                 data-pasutijuma_datums="{{ optional($p->pasutijuma_datums)->format('d/m/Y') }}"
                                 data-komentari="{{ ($p->komentari) }}"
                                 data-statuss="{{ $s }}"
@@ -146,7 +150,22 @@
                 <tr class="additional-info" style="display:none;">
                     <td colspan="11" style="background-color: #f8f9fa; border: 1px solid #080000ff;">
                         <div style="padding: 10px;">
+                            @php
+                                $previousNames = [];
+                                if (is_array($p->previous_artikuli_ids)) {
+                                    foreach ($p->previous_artikuli_ids as $prevId) {
+                                        if (isset($artikuliMap[$prevId])) {
+                                            $previousNames[] = $artikuliMap[$prevId]->nosaukums;
+                                        }
+                                    }
+                                }
+                            @endphp
+                            @if(!empty($previousNames))
+                                <strong>Bijušie artikuli:</strong> {{ implode(' -----> ', $previousNames) }} <br>
+                            @endif
                             <strong>Komentāri:</strong> {{ $p->komentari ?: '-' }} <br>
+                            <strong>Ārstniecības iestāde:</strong> {{ $p->arstniecibas_iestade ?: '-' }} <br>
+                            <strong>Ārsts:</strong> {{ $p->arsts ?: '-' }} <br>
                             <strong>Izveidoja:</strong> 
                             @if($p->creator)
                                 {{ $p->creator->name }}
@@ -210,7 +229,11 @@
     border: 1px solid transparent;
     text-transform: none;
 }
-.badge-status-neizpildits,
+.badge-status-neizpildits {
+    background: #d9ecff;
+    color: #0d47a1;
+    border:1px solid #0d47a1;
+}
 .badge-status-neapstradats {
     background: #dddcdc;
     color: #412f1e;

@@ -67,7 +67,9 @@
                         <span style="font-size: 1.2rem;">✅</span>
                     @endif
                 </td>
-                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">{{ $art->created_at->format('d/m/Y') }}</td>
+                <td style="border: 1px solid #080000ff; padding: 4px; text-align: center;">
+                    {{ optional($art->datums)->format('d/m/Y') ?? ($art->pazinojuma_datums ?: $art->created_at->format('d/m/Y')) }}
+                </td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->aptiekas->nosaukums }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->valsts }}</td>
                 <td style="border: 1px solid #080000ff; padding: 4px;">{{ $art->artikuli->id_numurs }}</td>
@@ -157,7 +159,7 @@
                                     <strong>Bijušie artikuli:</strong>
                                     {{ implode(' -----> ', $previousNames) }} <br>
                                 @endif
-                                <strong>Piezīmes:</strong> {{ $art->piezimes }} <br>
+                                <strong>Piezīmes:</strong> {!! nl2br(e($art->piezimes ?? '-')) !!} <br>
                                 <strong>Piegādes datums:</strong> {{ $art->piegades_datums }} <br>
                                 
                                 <strong>Izpildīja:</strong>

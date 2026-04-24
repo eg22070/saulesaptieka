@@ -21,14 +21,18 @@ class Pasutijums extends Model
         'receptes_numurs',
         'vards_uzvards',
         'talrunis_epasts',
+        'arstniecibas_iestade',
+        'arsts',
         'pasutijuma_datums',
         'komentari',
         'statuss',
         'hide_from_visiem',
+        'pieprasijuma_id',
         'who_completed',
         'who_cancelled',
         'completed_at',
         'cancelled_at',
+        'previous_artikuli_ids',
     ];
 
     protected $casts = [
@@ -36,6 +40,7 @@ class Pasutijums extends Model
         'pasutijuma_datums' => 'date',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'previous_artikuli_ids' => 'array',
     ];
 
     public function product()
@@ -54,5 +59,10 @@ class Pasutijums extends Model
     public function canceller()
     {
         return $this->belongsTo(\App\Models\User::class, 'who_cancelled');
+    }
+
+    public function pieprasijums()
+    {
+        return $this->belongsTo(PasutijumuPieprasijums::class, 'pieprasijuma_id');
     }
 }

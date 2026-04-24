@@ -25,10 +25,17 @@
                             {{ __('Artikuli') }}
                         </x-nav-link>
                     @else
-                    {{-- Pieprasījumi: brivibas + kruzes --}}
+                    {{-- Pieprasījumi: tikai brivibas --}}
+                    @if(auth()->check() && strtolower(auth()->user()->role) === 'brivibas')
+                        <x-nav-link :href="route('pasutijumu-pieprasijumi.index')" :active="request()->routeIs('pasutijumu-pieprasijumi.*')">
+                            {{ __('Pieprasījumi') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- Pieprasījumi noliktavai: brivibas + kruzes --}}
                     @if(auth()->check() && in_array(strtolower(auth()->user()->role), ['brivibas', 'kruzes']))
                         <x-nav-link :href="route('pieprasijumi.index')" :active="request()->routeIs('pieprasijumi.*')">
-                            {{ __('Pieprasījumi') }}
+                            {{ __('Pieprasījumi noliktavai') }}
                         </x-nav-link>
                     @endif
 

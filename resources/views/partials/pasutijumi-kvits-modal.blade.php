@@ -33,7 +33,7 @@
                         <input type="hidden" id="kv_artikula_id" name="artikula_id" value="">
                         <datalist id="kv_artikuli">
                             @foreach($artikuli as $a)
-                                <option value="{{ $a->nosaukums }}" data-id="{{ $a->id }}"></option>
+                                <option value="{{ $a->nosaukums }}" data-id="{{ $a->id }}" data-without-arst="{{ $a->without_arst ? 1 : 0 }}" data-nemedikamenti="{{ $a->nemedikamenti ? 1 : 0 }}"></option>
                             @endforeach
                         </datalist>
                     </div>
@@ -60,6 +60,16 @@
                     <div class="mb-2 d-flex align-items-center">
                         <label class="me-3" style="width:130px;">E-pasts <span class="text-muted fw-normal">(nav obligāts)</span></label>
                         <input id="kv_epasts" type="text" name="epasts" class="form-control" style="flex:1;">
+                    </div>
+
+                    <div class="mb-2 align-items-center" id="kv_arstniecibas_iestade_row" style="display:none;">
+                        <label class="me-3" style="width:130px;">Ārstniecības iestāde <span class="text-muted fw-normal">(nav obligāta)</span></label>
+                        <input id="kv_arstniecibas_iestade" type="text" name="arstniecibas_iestade" class="form-control" style="flex:1;">
+                    </div>
+
+                    <div class="mb-2 align-items-center" id="kv_arsts_row" style="display:none;">
+                        <label class="me-3" style="width:130px;">Ārsts <span class="text-muted fw-normal">(nav obligāts)</span></label>
+                        <input id="kv_arsts" type="text" name="arsts" class="form-control" style="flex:1;">
                     </div>
 
                     <div class="mb-2 d-flex align-items-center">

@@ -5,6 +5,7 @@ use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\PasutijumiController;
+use App\Http\Controllers\PasutijumuPieprasijumsController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +27,11 @@ Route::middleware('auth')->get('/', function () {
         return redirect()->route('pasutijumi.index');
     }
 
-    // default for brivibas, kruzes, others
+    if ($role === 'brivibas') {
+        return redirect()->route('pasutijumu-pieprasijumi.index');
+    }
+
+    // default for kruzes, others
     return redirect()->route('pieprasijumi.index');
 });
 
@@ -42,6 +47,33 @@ Route::post('pasutijumi/kvits', [PasutijumiController::class, 'storeKvits'])
     ->name('pasutijumi.kvits');
 Route::resource('pasutijumi', PasutijumiController::class)->middleware('auth');
 Route::resource('artikuli', ProductController::class)->middleware('auth');
+Route::post('pasutijumu-pieprasijumi/{pieprasijums}/sync-pasutijumi', [PasutijumuPieprasijumsController::class, 'syncPasutijumi'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.sync');
+Route::post('pasutijumu-pieprasijumi/{pieprasijums}/aizliegumi', [PasutijumuPieprasijumsController::class, 'updateAizliegumi'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.aizliegumi');
+Route::post('pasutijumu-pieprasijumi/{pieprasijums}/complete', [PasutijumuPieprasijumsController::class, 'complete'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.complete');
+Route::post('pasutijumu-pieprasijumi/{pieprasijums}/pasutijumi/{pasutijums}', [PasutijumuPieprasijumsController::class, 'updatePasutijums'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.pasutijumi.update');
+Route::post('pasutijumu-pieprasijumi/{pieprasijums}/brivie-artikuli', [PasutijumuPieprasijumsController::class, 'storeBrivaisArtikuls'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.brivie-artikuli.store');
+Route::post('pasutijumu-pieprasijumi/{pieprasijums}/brivie-artikuli/{brivaisArtikuls}', [PasutijumuPieprasijumsController::class, 'updateBrivaisArtikuls'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.brivie-artikuli.update');
+Route::delete('pasutijumu-pieprasijumi/{pieprasijums}/brivie-artikuli/{brivaisArtikuls}', [PasutijumuPieprasijumsController::class, 'destroyBrivaisArtikuls'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.brivie-artikuli.destroy');
+Route::get('pasutijumu-pieprasijumi/{pieprasijums}/export/word', [PasutijumuPieprasijumsController::class, 'exportWord'])
+    ->middleware('auth')
+    ->name('pasutijumu-pieprasijumi.export.word');
+Route::resource('pasutijumu-pieprasijumi', PasutijumuPieprasijumsController::class)
+    ->parameters(['pasutijumu-pieprasijumi' => 'pieprasijums'])
+    ->middleware('auth');
 Route::get('/pieprasijumi/bulk-complete', [RequestController::class, 'bulkComplete'])
     ->middleware(['auth', 'block_special_user'])
     ->name('pieprasijumi.bulkComplete');

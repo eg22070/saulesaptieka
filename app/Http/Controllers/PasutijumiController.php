@@ -10,6 +10,21 @@ use Illuminate\Support\Facades\Schema;
 
 class PasutijumiController extends Controller
 {
+    protected function shouldHideDoctorFieldsForArtikuls(?int $artikulaId): bool
+    {
+        if (!$artikulaId) {
+            return false;
+        }
+
+        return Product::query()
+            ->whereKey($artikulaId)
+            ->where(function ($q) {
+                $q->where('without_arst', true)
+                    ->orWhere('nemedikamenti', true);
+            })
+            ->exists();
+    }
+
     protected function nextPasutijumaNumurs(): string
     {
         $max = Pasutijums::query()
@@ -126,6 +141,8 @@ class PasutijumiController extends Controller
             'pasutijuma_numurs' => 'nullable|string|max:191',
             'receptes_numurs' => 'nullable|string|max:191',
             'talrunis_epasts' => 'nullable|string|max:255',
+            'arstniecibas_iestade' => 'nullable|string|max:255',
+            'arsts' => 'nullable|string|max:255',
             'pasutijuma_datums' => 'nullable|date_format:d/m/Y',
             'komentari' => 'nullable|string',
             'statuss' => 'nullable|in:izpildits,neizpildits,atcelts,neapstradats',
@@ -146,6 +163,11 @@ class PasutijumiController extends Controller
 
         if (empty($data['statuss'])) {
             $data['statuss'] = 'neizpildits';
+        }
+
+        if ($this->shouldHideDoctorFieldsForArtikuls((int) ($data['artikula_id'] ?? 0))) {
+            $data['arstniecibas_iestade'] = null;
+            $data['arsts'] = null;
         }
 
         $data['farmaceita_nosaukums'] = null;
@@ -213,6 +235,8 @@ class PasutijumiController extends Controller
                 },
             ],
             'epasts' => 'nullable|string|max:255',
+            'arstniecibas_iestade' => 'nullable|string|max:255',
+            'arsts' => 'nullable|string|max:255',
             'komentari' => 'nullable|string',
         ]);
 
@@ -239,6 +263,8 @@ class PasutijumiController extends Controller
         $today = Carbon::now()->toDateString();
         $todayDmY = Carbon::now()->format('d/m/Y');
 
+        $hideDoctorFields = $this->shouldHideDoctorFieldsForArtikuls($artikulaId);
+
         $payload = [
             'datums' => null,
             'artikula_id' => $artikulaId,
@@ -248,6 +274,8 @@ class PasutijumiController extends Controller
             'receptes_numurs' => $data['receptes_numurs'] ?? null,
             'vards_uzvards' => $data['vards_uzvards'],
             'talrunis_epasts' => $talrunisEpasts !== '' ? $talrunisEpasts : null,
+            'arstniecibas_iestade' => $hideDoctorFields ? null : ($data['arstniecibas_iestade'] ?? null),
+            'arsts' => $hideDoctorFields ? null : ($data['arsts'] ?? null),
             'pasutijuma_datums' => $today,
             'komentari' => $data['komentari'] ?? null,
             'statuss' => 'neapstradats',
@@ -301,6 +329,8 @@ class PasutijumiController extends Controller
             'pasutijuma_numurs' => 'nullable|string|max:191',
             'receptes_numurs' => 'nullable|string|max:191',
             'talrunis_epasts' => 'nullable|string|max:255',
+            'arstniecibas_iestade' => 'nullable|string|max:255',
+            'arsts' => 'nullable|string|max:255',
             'pasutijuma_datums' => 'nullable|date_format:d/m/Y',
             'komentari' => 'nullable|string',
             'statuss' => 'nullable|in:izpildits,neizpildits,atcelts,neapstradats',
@@ -318,6 +348,11 @@ class PasutijumiController extends Controller
             }
             $data['farmaceita_nosaukums'] = $farm;
             $data['artikula_id'] = null;
+        }
+
+        if ($this->shouldHideDoctorFieldsForArtikuls((int) ($data['artikula_id'] ?? 0))) {
+            $data['arstniecibas_iestade'] = null;
+            $data['arsts'] = null;
         }
         if (!empty($data['datums'])) {
             $data['datums'] = Carbon::createFromFormat('d/m/Y', $data['datums'])->toDateString();

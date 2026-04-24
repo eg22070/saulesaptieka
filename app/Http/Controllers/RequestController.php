@@ -7,10 +7,54 @@ use App\Models\Requests;
 use App\Models\Pharmacy;  // Assuming such model exists
 use App\Models\Product;
 use App\Models\DeleteHistory;
+use App\Models\Pasutijums;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RequestController extends Controller
 {
+    protected function extractPasutijumaPieprasijumaId(?string $piezimes): ?int
+    {
+        if (!$piezimes) {
+            return null;
+        }
+
+        if (preg_match('/pasūtījumu pieprasījuma\s*#\s*(\d+)/iu', $piezimes, $matches)) {
+            return (int) $matches[1];
+        }
+
+        if (preg_match('/pasutijumu pieprasijuma\s*#\s*(\d+)/iu', $piezimes, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
+    }
+
+    protected function syncLinkedPasutijumiArtikuls(int $pieprasijumaId, int $oldArtikulaId, int $newArtikulaId): void
+    {
+        if ($oldArtikulaId === $newArtikulaId) {
+            return;
+        }
+
+        $linkedPasutijumi = Pasutijums::query()
+            ->where('pieprasijuma_id', $pieprasijumaId)
+            ->where('artikula_id', $oldArtikulaId)
+            ->get();
+
+        foreach ($linkedPasutijumi as $pasutijums) {
+            $history = is_array($pasutijums->previous_artikuli_ids) ? $pasutijums->previous_artikuli_ids : [];
+            if (!in_array($oldArtikulaId, $history)) {
+                $history[] = $oldArtikulaId;
+            }
+
+            $pasutijums->artikula_id = $newArtikulaId;
+            $pasutijums->farmaceita_nosaukums = null;
+            $pasutijums->previous_artikuli_ids = array_values(array_unique($history));
+            $pasutijums->save();
+        }
+    }
+
     protected function artikuliForCurrentUser()
     {
         $query = Product::query();
@@ -98,15 +142,33 @@ class RequestController extends Controller
         $artikuli = $this->artikuliForCurrentUser();
         // Fetch all aptiekas for dropdowns
 
-        $sort      = $request->input('sort', 'created_at');      // default sort field
-        $direction = $request->input('direction', 'desc');   // default ascending
+        $sort = $request->input('sort', 'created_at'); // default sort field
+        $direction = strtolower((string) $request->input('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         $query->orderBy('cito', 'desc');
 
         if ($sort === 'created_at') {
-            $query->orderBy('created_at', $direction);
+            $hasDatums = Schema::hasColumn('pieprasijumi', 'datums');
+            $hasPazinojumaDatums = Schema::hasColumn('pieprasijumi', 'pazinojuma_datums');
+            $driver = DB::connection()->getDriverName();
+
+            $dateSortParts = [];
+            if ($hasDatums) {
+                $dateSortParts[] = 'datums';
+            }
+            if ($hasPazinojumaDatums && $driver === 'mysql') {
+                $dateSortParts[] = "STR_TO_DATE(pazinojuma_datums, '%d/%m/%Y')";
+            }
+            $dateSortParts[] = 'DATE(created_at)';
+
+            $dateSortExpression = 'COALESCE('.implode(', ', $dateSortParts).')';
+
+            $query->orderByRaw($dateSortExpression.' '.$direction)
+                ->orderBy('created_at', $direction)
+                ->orderBy('id', $direction);
         } else {
-            $query->orderBy('created_at', 'asc'); // fallback
+            $query->orderBy('created_at', 'asc')
+                ->orderBy('id', 'asc'); // fallback
         }
 
         $aptiekas = Pharmacy::all();
@@ -221,17 +283,26 @@ class RequestController extends Controller
             }
         }
         
-        if ($oldArtikulaId != $newArtikulaId) {
-            $history = $requestItem->previous_artikuli_ids ?? [];
-
-            if (!in_array($oldArtikulaId, $history)) {
-                $history[] = $oldArtikulaId;
+        DB::transaction(function () use ($requestItem, $validated, $oldArtikulaId, $newArtikulaId) {
+            if ($oldArtikulaId != $newArtikulaId) {
+                $history = $requestItem->previous_artikuli_ids ?? [];
+                if (!in_array($oldArtikulaId, $history)) {
+                    $history[] = $oldArtikulaId;
+                }
+                $requestItem->previous_artikuli_ids = array_values(array_unique($history));
             }
 
-            $requestItem->previous_artikuli_ids = $history;
-        }
-        $requestItem->fill($validated);
-        $requestItem->save();
+            $requestItem->fill($validated);
+            $requestItem->save();
+
+            if ($oldArtikulaId != $newArtikulaId) {
+                $linkedPieprasijumaId = $this->extractPasutijumaPieprasijumaId($requestItem->piezimes);
+                if ($linkedPieprasijumaId) {
+                    $this->syncLinkedPasutijumiArtikuls((int) $linkedPieprasijumaId, (int) $oldArtikulaId, (int) $newArtikulaId);
+                }
+            }
+        });
+
         return redirect()->back()->with('success', 'Pieprasījums veiksmīgi atjaunināts');
     }
 

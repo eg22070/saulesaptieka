@@ -33,7 +33,7 @@
                         <input type="hidden" id="m_artikula_id" name="artikula_id" value="">
                         <datalist id="m_artikuli">
                             @foreach($artikuli as $a)
-                                <option value="{{ $a->nosaukums }}" data-id="{{ $a->id }}"></option>
+                                <option value="{{ $a->nosaukums }}" data-id="{{ $a->id }}" data-without-arst="{{ $a->without_arst ? 1 : 0 }}" data-nemedikamenti="{{ $a->nemedikamenti ? 1 : 0 }}"></option>
                             @endforeach
                         </datalist>
                     </div>
@@ -70,6 +70,16 @@
                     <div class="mb-2 d-flex align-items-center">
                         <label class="me-3" style="width:130px;">Tālrunis, e-pasts</label>
                         <input id="m_talrunis_epasts" type="text" name="talrunis_epasts" class="form-control" style="flex:1;">
+                    </div>
+
+                    <div class="mb-2 d-flex align-items-center" id="m_arstniecibas_iestade_row">
+                        <label class="me-3" style="width:130px;">Ārstniecības iestāde</label>
+                        <input id="m_arstniecibas_iestade" type="text" name="arstniecibas_iestade" class="form-control" style="flex:1;">
+                    </div>
+
+                    <div class="mb-2 d-flex align-items-center" id="m_arsts_row">
+                        <label class="me-3" style="width:130px;">Ārsts</label>
+                        <input id="m_arsts" type="text" name="arsts" class="form-control" style="flex:1;">
                     </div>
 
                     <div class="mb-2 d-flex align-items-center">
